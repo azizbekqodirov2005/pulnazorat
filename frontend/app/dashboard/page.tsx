@@ -2,14 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { TrendingUp, TrendingDown, PieChart as PieChartIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  PieChart as PieChartIcon,
+  ChevronLeft,
+  ChevronRight,
+  BellRing,
+} from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import StatCard from "@/components/StatCard";
 import ProFeaturesGrid from "@/components/ProFeaturesGrid";
 import { useAuth } from "@/lib/auth-context";
-import { transactionsApi, Summary } from "@/lib/api";
+import { transactionsApi, recurringApi, Summary, RecurringPayment } from "@/lib/api";
 import { formatSom, currentMonth, monthLabel, shiftMonth } from "@/lib/format";
 import { useLanguage } from "@/lib/language-context";
+import { isReminderDueSoon, daysUntilDue } from "@/lib/reminders";
 
 const COLORS = ["#27824e", "#37a163", "#5bbb81", "#8ed3a8", "#bce6cc", "#0891b2", "#0ea5e9", "#94a3b8"];
 
@@ -20,6 +28,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [month, setMonth] = useState(currentMonth());
   const isCurrentMonth = month === currentMonth();
+  const [dueSoon, setDueSoon] = useState<RecurringPayment[]>([]);
 
   useEffect(() => {
     if (!token) return;
@@ -29,6 +38,16 @@ export default function DashboardPage() {
       .then(setSummary)
       .catch(() => setError(t("dashboard.loadError")));
   }, [token, month]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!token || user?.plan !== "pro") return;
+    recurringApi
+      .list(token)
+      .then((items) => setDueSoon(items.filter((item) => isReminderDueSoon(item))))
+      .catch(() => {
+        // eslatmalarni yuklab bo'lmasa ham bosh sahifa ishlashda davom etadi
+      });
+  }, [token, user?.plan]);
 
   const byCategory = (summary?.byCategory ?? []).map((c) => ({ ...c, name: tCategory(c.name) }));
 
@@ -60,6 +79,31 @@ export default function DashboardPage() {
         </div>
 
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
+        {dueSoon.length > 0 && (
+          <div className="mt-4 flex flex-col gap-2">
+            {dueSoon.map((item) => {
+              const remaining = daysUntilDue(item);
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 rounded-xl bg-amber-50 px-3.5 py-3 text-amber-700"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/60">
+                    <BellRing size={15} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[13px] font-semibold">{item.title}</p>
+                    <p className="text-[12px]">
+                      {remaining === 0 ? t("reminder.dueToday") : t("reminder.daysLeft", { days: remaining })}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-[13px] font-bold">{formatSom(item.amount, lang)}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {summary && (
           <>

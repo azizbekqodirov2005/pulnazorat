@@ -53,6 +53,8 @@ export const translations: Record<Lang, Dict> = {
     "dashboard.loadError": "Ma'lumotlarni yuklab bo'lmadi",
     "dashboard.prevMonth": "Oldingi oy",
     "dashboard.nextMonth": "Keyingi oy",
+    "reminder.dueToday": "Bugun to'lov kuni",
+    "reminder.daysLeft": "{days} kundan keyin to'lov",
 
     "tx.title": "Tranzaksiyalar",
     "tx.expense": "Chiqim",
@@ -164,6 +166,8 @@ export const translations: Record<Lang, Dict> = {
     "dashboard.loadError": "Не удалось загрузить данные",
     "dashboard.prevMonth": "Предыдущий месяц",
     "dashboard.nextMonth": "Следующий месяц",
+    "reminder.dueToday": "Платёж сегодня",
+    "reminder.daysLeft": "Платёж через {days} дн.",
 
     "tx.title": "Транзакции",
     "tx.expense": "Расход",

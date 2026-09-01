@@ -7,6 +7,7 @@ import ProGate from "@/components/ProGate";
 import { useAuth } from "@/lib/auth-context";
 import { recurringApi, RecurringPayment } from "@/lib/api";
 import { formatSom } from "@/lib/format";
+import { isReminderDueSoon } from "@/lib/reminders";
 
 export default function RecurringPage() {
   return (
@@ -82,6 +83,11 @@ function RecurringContent() {
                     Har oyning {i.dueDay}-kuni · {i.reminderDaysBefore} kun oldin eslatiladi
                   </p>
                 </div>
+                {isReminderDueSoon(i) && (
+                  <span className="shrink-0 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                    Yaqinlashmoqda
+                  </span>
+                )}
                 <span className="shrink-0 text-[14px] font-bold text-slate-800">{formatSom(i.amount)}</span>
                 <button
                   onClick={() => toggleActive(i)}
