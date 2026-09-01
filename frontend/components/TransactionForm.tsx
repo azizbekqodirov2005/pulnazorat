@@ -131,9 +131,9 @@ export default function TransactionForm({
         />
         {isOtherMonth && (
           <p className="rounded-lg bg-amber-50 px-3 py-2 text-[13px] text-amber-700">
-            Diqqat: bu — o'tgan sana. Ushbu {type === "income" ? "kirim" : "chiqim"}{" "}
-            <strong>{monthLabel(occurredMonth)}</strong> oyi xulosasiga yoziladi, joriy oy dashboard'ida
-            ko'rinmaydi.
+            Diqqat: bu — o&apos;tgan sana. Ushbu {type === "income" ? "kirim" : "chiqim"}{" "}
+            <strong>{monthLabel(occurredMonth)}</strong> oyi xulosasiga yoziladi, joriy oy dashboard&apos;ida
+            ko&apos;rinmaydi.
           </p>
         )}
       </label>
