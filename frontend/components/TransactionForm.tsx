@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { Category } from "@/lib/api";
-import { todayIso } from "@/lib/format";
+import { todayIso, currentMonth, monthLabel } from "@/lib/format";
 
 export interface TransactionFormValues {
   type: "income" | "expense";
@@ -29,6 +29,8 @@ export default function TransactionForm({
   const [error, setError] = useState<string | null>(null);
 
   const filteredCategories = categories.filter((c) => c.type === type);
+  const occurredMonth = occurredOn.slice(0, 7);
+  const isOtherMonth = occurredMonth.length === 7 && occurredMonth !== currentMonth();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -127,6 +129,13 @@ export default function TransactionForm({
           onChange={(e) => setOccurredOn(e.target.value)}
           className="input"
         />
+        {isOtherMonth && (
+          <p className="rounded-lg bg-amber-50 px-3 py-2 text-[13px] text-amber-700">
+            Diqqat: bu — o'tgan sana. Ushbu {type === "income" ? "kirim" : "chiqim"}{" "}
+            <strong>{monthLabel(occurredMonth)}</strong> oyi xulosasiga yoziladi, joriy oy dashboard'ida
+            ko'rinmaydi.
+          </p>
+        )}
       </label>
 
       <label className="flex flex-col gap-1.5">
