@@ -1,0 +1,8 @@
+# Netlify uchun: repo bog'langanda "Base directory" = frontend qilib qo'ying,
+# yoki shu faylni frontend/ ichida qoldiring — Netlify avtomatik topadi.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

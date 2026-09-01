@@ -1,0 +1,22 @@
+# Render Blueprint — backend'ni bir marta "New Blueprint" orqali joylashtirish uchun.
+# Render dashboard'da: New -> Blueprint -> shu repo -> Apply.
+# DATABASE_URL'ni Neon'dan olib qo'lda kiritasiz (sync: false — maxfiy qiymat repo'da saqlanmaydi).
+services:
+  - type: web
+    name: pulnazorat-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRES
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES
+        value: 30d
