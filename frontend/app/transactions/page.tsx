@@ -1,19 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Trash2, Receipt } from "lucide-react";
+import { Trash2, Receipt, Pencil, X } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import TransactionForm, { TransactionFormValues } from "@/components/TransactionForm";
 import { useAuth } from "@/lib/auth-context";
 import { categoriesApi, transactionsApi, Category, Transaction } from "@/lib/api";
 import { formatSom } from "@/lib/format";
+import { useLanguage } from "@/lib/language-context";
 
 export default function TransactionsPage() {
   const { token } = useAuth();
+  const { t, tCategory, lang } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
 
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
@@ -27,9 +30,9 @@ export default function TransactionsPage() {
       setCategories(cats);
       setTransactions(txs.items);
     } catch {
-      setError("Ma'lumotlarni yuklab bo'lmadi");
+      setError(t("tx.loadError"));
     }
-  }, [token]);
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     load();
@@ -43,7 +46,27 @@ export default function TransactionsPage() {
       await transactionsApi.create(token, values);
       await load();
     } catch {
-      setError("Tranzaksiyani saqlab bo'lmadi");
+      setError(t("tx.createError"));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleUpdate(values: TransactionFormValues) {
+    if (!token || !editingTx) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await transactionsApi.update(token, editingTx.id, {
+        categoryId: values.categoryId,
+        amount: values.amount,
+        note: values.note,
+        occurredOn: values.occurredOn,
+      });
+      await load();
+      setEditingTx(null);
+    } catch {
+      setError(t("tx.updateError"));
     } finally {
       setSubmitting(false);
     }
@@ -58,7 +81,7 @@ export default function TransactionsPage() {
   return (
     <ProtectedRoute>
       <main className="app-container-wide py-6 sm:py-8">
-        <h1 className="text-xl font-bold text-slate-900">Tranzaksiyalar</h1>
+        <h1 className="text-xl font-bold text-slate-900">{t("tx.title")}</h1>
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
@@ -71,17 +94,15 @@ export default function TransactionsPage() {
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-300">
                   <Receipt size={22} />
                 </span>
-                <p className="mt-3 text-sm text-slate-500">
-                  Hali tranzaksiya yo&apos;q — chapdagi (yoki yuqoridagi) formadan qo&apos;shing.
-                </p>
+                <p className="mt-3 text-sm text-slate-500">{t("tx.empty")}</p>
               </div>
             ) : (
               <ul className="divide-y divide-slate-100">
-                {transactions.map((t) => {
-                  const category = categoryMap.get(t.categoryId);
-                  const positive = t.type === "income";
+                {transactions.map((tx) => {
+                  const category = categoryMap.get(tx.categoryId);
+                  const positive = tx.type === "income";
                   return (
-                    <li key={t.id} className="flex items-center gap-3 px-4 py-3.5 sm:px-5">
+                    <li key={tx.id} className="flex items-center gap-3 px-4 py-3.5 sm:px-5">
                       <span
                         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg ${
                           positive ? "bg-emerald-50" : "bg-slate-50"
@@ -91,23 +112,30 @@ export default function TransactionsPage() {
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[14px] font-semibold text-slate-800">
-                          {category?.name ?? "Kategoriya"}
+                          {category ? tCategory(category.name) : t("tx.category")}
                         </p>
                         <p className="truncate text-[12px] text-slate-500">
-                          {t.note ? `${t.note} · ` : ""}
-                          {t.occurredOn.slice(0, 10)}
+                          {tx.note ? `${tx.note} · ` : ""}
+                          {tx.occurredOn.slice(0, 10)}
                         </p>
                       </div>
-                      <div className="flex shrink-0 items-center gap-2.5">
+                      <div className="flex shrink-0 items-center gap-1.5">
                         <span
                           className={`text-[14px] font-bold ${positive ? "text-emerald-600" : "text-slate-800"}`}
                         >
                           {positive ? "+" : "-"}
-                          {formatSom(t.amount)}
+                          {formatSom(tx.amount, lang)}
                         </span>
                         <button
-                          onClick={() => handleDelete(t.id)}
-                          aria-label="O'chirish"
+                          onClick={() => setEditingTx(tx)}
+                          aria-label={t("tx.editAria")}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:bg-brand-50 hover:text-brand-600"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(tx.id)}
+                          aria-label={t("tx.deleteAria")}
                           className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
                         >
                           <Trash2 size={14} />
@@ -120,6 +148,43 @@ export default function TransactionsPage() {
             )}
           </div>
         </div>
+
+        {editingTx && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+            onClick={() => setEditingTx(null)}
+          >
+            <div
+              className="w-full max-w-sm"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-slate-700">{t("tx.editTitle")}</h2>
+                <button
+                  onClick={() => setEditingTx(null)}
+                  aria-label={t("common.close")}
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <TransactionForm
+                categories={categories}
+                submitting={submitting}
+                onSubmit={handleUpdate}
+                onCancel={() => setEditingTx(null)}
+                submitLabel={t("common.save")}
+                initialValues={{
+                  type: editingTx.type,
+                  categoryId: editingTx.categoryId,
+                  amount: editingTx.amount,
+                  note: editingTx.note ?? undefined,
+                  occurredOn: editingTx.occurredOn.slice(0, 10),
+                }}
+              />
+            </div>
+          </div>
+        )}
       </main>
     </ProtectedRoute>
   );

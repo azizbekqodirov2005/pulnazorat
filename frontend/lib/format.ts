@@ -1,5 +1,6 @@
-export function formatSom(amount: number): string {
-  return new Intl.NumberFormat("uz-UZ").format(Math.round(amount)) + " so'm";
+export function formatSom(amount: number, lang: "uz" | "ru" = "uz"): string {
+  const formatted = new Intl.NumberFormat("uz-UZ").format(Math.round(amount));
+  return lang === "ru" ? `${formatted} сум` : `${formatted} so'm`;
 }
 
 export function currentMonth(): string {
@@ -16,9 +17,15 @@ const UZ_MONTHS = [
   "Iyul", "Avgust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr",
 ];
 
-export function monthLabel(month: string): string {
+const RU_MONTHS = [
+  "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+  "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь",
+];
+
+export function monthLabel(month: string, lang: "uz" | "ru" = "uz"): string {
   const [year, m] = month.split("-").map(Number);
-  const name = UZ_MONTHS[(m ?? 1) - 1] ?? month;
+  const list = lang === "ru" ? RU_MONTHS : UZ_MONTHS;
+  const name = list[(m ?? 1) - 1] ?? month;
   return `${name} ${year}`;
 }
 

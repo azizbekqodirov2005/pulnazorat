@@ -3,26 +3,28 @@
 import Link from "next/link";
 import { Wallet2, Target, HandCoins, Repeat, Lock } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-
-const ITEMS = [
-  { href: "/budgets", label: "Byudjet", icon: Wallet2 },
-  { href: "/goals", label: "Maqsadlar", icon: Target },
-  { href: "/debts", label: "Qarz-nasiya", icon: HandCoins },
-  { href: "/recurring", label: "To'lovlar", icon: Repeat },
-];
+import { useLanguage } from "@/lib/language-context";
 
 export default function ProFeaturesGrid() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const isPro = user?.plan === "pro";
+
+  const items = [
+    { href: "/budgets", label: t("proFeatures.budgets"), icon: Wallet2 },
+    { href: "/goals", label: t("proFeatures.goals"), icon: Target },
+    { href: "/debts", label: t("proFeatures.debts"), icon: HandCoins },
+    { href: "/recurring", label: t("proFeatures.recurring"), icon: Repeat },
+  ];
 
   return (
     <div className="mt-4">
       <div className="mb-2.5 flex items-center gap-1.5">
-        <p className="text-[13px] font-semibold text-slate-600">Pro imkoniyatlar</p>
+        <p className="text-[13px] font-semibold text-slate-600">{t("dashboard.proFeatures")}</p>
         {!isPro && <Lock size={12} className="text-slate-400" />}
       </div>
       <div className="grid grid-cols-4 gap-2.5">
-        {ITEMS.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
           return (
             <Link

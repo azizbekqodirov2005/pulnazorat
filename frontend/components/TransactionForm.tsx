@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Category } from "@/lib/api";
 import { todayIso, currentMonth, monthLabel } from "@/lib/format";
+import { useLanguage } from "@/lib/language-context";
 
 export interface TransactionFormValues {
   type: "income" | "expense";
@@ -16,16 +17,24 @@ export default function TransactionForm({
   categories,
   onSubmit,
   submitting,
+  initialValues,
+  submitLabel,
+  onCancel,
 }: {
   categories: Category[];
   onSubmit: (values: TransactionFormValues) => Promise<void>;
   submitting: boolean;
+  initialValues?: TransactionFormValues;
+  submitLabel?: string;
+  onCancel?: () => void;
 }) {
-  const [type, setType] = useState<"income" | "expense">("expense");
-  const [categoryId, setCategoryId] = useState("");
-  const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("");
-  const [occurredOn, setOccurredOn] = useState(todayIso());
+  const { t, tCategory, lang } = useLanguage();
+  const isEditing = Boolean(initialValues);
+  const [type, setType] = useState<"income" | "expense">(initialValues?.type ?? "expense");
+  const [categoryId, setCategoryId] = useState(initialValues?.categoryId ?? "");
+  const [amount, setAmount] = useState(initialValues ? String(initialValues.amount) : "");
+  const [note, setNote] = useState(initialValues?.note ?? "");
+  const [occurredOn, setOccurredOn] = useState(initialValues?.occurredOn ?? todayIso());
   const [error, setError] = useState<string | null>(null);
 
   const filteredCategories = categories.filter((c) => c.type === type);
@@ -37,21 +46,23 @@ export default function TransactionForm({
     setError(null);
     const numericAmount = Number(amount);
     if (!categoryId) {
-      setError("Kategoriyani tanlang");
+      setError(t("tx.categoryRequired"));
       return;
     }
     if (!numericAmount || numericAmount <= 0) {
-      setError("Summani to'g'ri kiriting");
+      setError(t("tx.amountRequired"));
       return;
     }
     if (occurredOn > todayIso()) {
-      setError("Kelajakdagi sana kiritib bo'lmaydi — bugungi yoki oldingi sanani tanlang");
+      setError(t("tx.futureDateError"));
       return;
     }
     await onSubmit({ type, categoryId, amount: numericAmount, note: note || undefined, occurredOn });
-    setAmount("");
-    setNote("");
-    setCategoryId("");
+    if (!isEditing) {
+      setAmount("");
+      setNote("");
+      setCategoryId("");
+    }
   }
 
   return (
@@ -59,32 +70,35 @@ export default function TransactionForm({
       <div className="flex gap-2 rounded-xl bg-slate-100 p-1">
         <button
           type="button"
+          disabled={isEditing}
           onClick={() => {
             setType("expense");
             setCategoryId("");
           }}
           className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${
             type === "expense" ? "bg-white text-red-600 shadow-soft" : "text-slate-500"
-          }`}
+          } ${isEditing ? "cursor-not-allowed opacity-60" : ""}`}
         >
-          Chiqim
+          {t("tx.expense")}
         </button>
         <button
           type="button"
+          disabled={isEditing}
           onClick={() => {
             setType("income");
             setCategoryId("");
           }}
           className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${
             type === "income" ? "bg-white text-emerald-600 shadow-soft" : "text-slate-500"
-          }`}
+          } ${isEditing ? "cursor-not-allowed opacity-60" : ""}`}
         >
-          Kirim
+          {t("tx.income")}
         </button>
       </div>
+      {isEditing && <p className="-mt-2 text-[12px] text-slate-400">{t("tx.editLockNote")}</p>}
 
       <div>
-        <p className="mb-2 text-[13px] font-medium text-slate-600">Kategoriya</p>
+        <p className="mb-2 text-[13px] font-medium text-slate-600">{t("tx.category")}</p>
         <div className="grid grid-cols-3 gap-2">
           {filteredCategories.map((c) => {
             const active = categoryId === c.id;
@@ -100,7 +114,7 @@ export default function TransactionForm({
                 }`}
               >
                 <span className="text-lg leading-none">{c.icon}</span>
-                <span className="line-clamp-1 text-[11px] font-medium">{c.name}</span>
+                <span className="line-clamp-1 text-[11px] font-medium">{tCategory(c.name)}</span>
               </button>
             );
           })}
@@ -108,7 +122,7 @@ export default function TransactionForm({
       </div>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-[13px] font-medium text-slate-600">Summa</span>
+        <span className="text-[13px] font-medium text-slate-600">{t("tx.amount")}</span>
         <input
           type="number"
           min={1}
@@ -121,7 +135,7 @@ export default function TransactionForm({
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-[13px] font-medium text-slate-600">Sana</span>
+        <span className="text-[13px] font-medium text-slate-600">{t("tx.date")}</span>
         <input
           type="date"
           value={occurredOn}
@@ -131,18 +145,19 @@ export default function TransactionForm({
         />
         {isOtherMonth && (
           <p className="rounded-lg bg-amber-50 px-3 py-2 text-[13px] text-amber-700">
-            Diqqat: bu — o&apos;tgan sana. Ushbu {type === "income" ? "kirim" : "chiqim"}{" "}
-            <strong>{monthLabel(occurredMonth)}</strong> oyi xulosasiga yoziladi, joriy oy dashboard&apos;ida
-            ko&apos;rinmaydi.
+            {t("tx.pastMonthWarning", {
+              type: type === "income" ? t("tx.income").toLowerCase() : t("tx.expense").toLowerCase(),
+              month: monthLabel(occurredMonth, lang),
+            })}
           </p>
         )}
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-[13px] font-medium text-slate-600">Izoh (ixtiyoriy)</span>
+        <span className="text-[13px] font-medium text-slate-600">{t("tx.note")}</span>
         <input
           type="text"
-          placeholder="masalan: Bozor"
+          placeholder={t("tx.notePlaceholder")}
           value={note}
           onChange={(e) => setNote(e.target.value)}
           className="input"
@@ -151,9 +166,16 @@ export default function TransactionForm({
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      <button disabled={submitting} className="btn-primary">
-        {submitting ? "Saqlanmoqda..." : "Qo'shish"}
-      </button>
+      <div className="flex gap-2">
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="btn-secondary flex-1">
+            {t("common.cancel")}
+          </button>
+        )}
+        <button disabled={submitting} className="btn-primary flex-1">
+          {submitting ? t("common.saving") : submitLabel ?? t("common.add")}
+        </button>
+      </div>
     </form>
   );
 }

@@ -114,6 +114,11 @@ export const transactionsApi = {
     token: string,
     input: { categoryId: string; type: "income" | "expense"; amount: number; note?: string; occurredOn: string }
   ) => request<Transaction>("/transactions", { method: "POST", body: JSON.stringify(input), token }),
+  update: (
+    token: string,
+    id: string,
+    input: { categoryId?: string; amount?: number; note?: string; occurredOn?: string }
+  ) => request<Transaction>(`/transactions/${id}`, { method: "PATCH", body: JSON.stringify(input), token }),
   remove: (token: string, id: string) => request<void>(`/transactions/${id}`, { method: "DELETE", token }),
   summary: (token: string, month: string) => request<Summary>(`/transactions/summary?month=${month}`, { token }),
 };

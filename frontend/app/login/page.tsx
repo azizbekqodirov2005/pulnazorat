@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import { Wallet } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api";
+import { useLanguage } from "@/lib/language-context";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +25,7 @@ export default function LoginPage() {
       await login(emailOrPhone, password);
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Xatolik yuz berdi");
+      setError(err instanceof ApiError ? err.message : t("common.genericError"));
     } finally {
       setSubmitting(false);
     }
@@ -36,12 +38,12 @@ export default function LoginPage() {
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-card">
             <Wallet size={26} strokeWidth={2.2} />
           </span>
-          <h1 className="mt-4 text-2xl font-bold text-brand-950">Xush kelibsiz</h1>
-          <p className="mt-1 text-sm text-slate-500">Hisobingizga kiring</p>
+          <h1 className="mt-4 text-2xl font-bold text-brand-950">{t("auth.login.title")}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t("auth.login.subtitle")}</p>
         </div>
 
         <form onSubmit={onSubmit} className="card flex flex-col gap-4">
-          <Field label="Email yoki telefon">
+          <Field label={t("auth.login.emailOrPhone")}>
             <input
               required
               value={emailOrPhone}
@@ -50,7 +52,7 @@ export default function LoginPage() {
               placeholder="you@example.com"
             />
           </Field>
-          <Field label="Parol">
+          <Field label={t("auth.login.password")}>
             <input
               required
               type="password"
@@ -61,14 +63,14 @@ export default function LoginPage() {
           </Field>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button disabled={submitting} className="btn-primary mt-1">
-            {submitting ? "Kirilmoqda..." : "Kirish"}
+            {submitting ? t("auth.login.submitting") : t("auth.login.submit")}
           </button>
         </form>
 
         <p className="mt-5 text-center text-sm text-slate-500">
-          Hisobingiz yo&apos;qmi?{" "}
+          {t("auth.login.noAccount")}{" "}
           <Link href="/register" className="font-semibold text-brand-700">
-            Ro&apos;yxatdan o&apos;ting
+            {t("auth.login.registerLink")}
           </Link>
         </p>
       </div>
