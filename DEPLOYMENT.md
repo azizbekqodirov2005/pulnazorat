@@ -14,20 +14,19 @@ Bu qo'llanma platformani internetga **butunlay bepul** chiqarish uchun. Uch xizm
 
 ## 0-qadam: Kodni GitHub'ga yuklash
 
+Bu zip ichida git repository allaqachon tayyorlangan (boshlang'ich commit bilan) — sizga faqat GitHub'ga ulash va yuborish qoladi.
+
+1. https://github.com/new saytida yangi **bo'sh** repository yarating (nomi, masalan, `pulnazorat`) — "Add a README" belgisini **bosmang**, repo butunlay bo'sh bo'lishi kerak
+2. Zipni kompyuteringizga ochib, o'sha papkaga kiring va quyidagini bajaring:
+
 ```bash
 cd pulnazorat
-git init
-git add .
-git commit -m "PulNazorat — boshlang'ich versiya"
-```
-
-GitHub'da yangi bo'sh repository yarating (masalan `pulnazorat`), keyin:
-
-```bash
 git remote add origin https://github.com/<username>/pulnazorat.git
 git branch -M main
 git push -u origin main
 ```
+
+GitHub sizdan login/parol so'rasa — parol o'rniga **Personal Access Token** kerak bo'ladi (GitHub parolni endi qabul qilmaydi): Settings → Developer settings → Personal access tokens → Generate new token, "repo" huquqi bilan.
 
 ---
 
