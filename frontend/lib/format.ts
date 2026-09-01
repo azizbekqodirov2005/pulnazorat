@@ -21,3 +21,9 @@ export function monthLabel(month: string): string {
   const name = UZ_MONTHS[(m ?? 1) - 1] ?? month;
   return `${name} ${year}`;
 }
+
+export function shiftMonth(month: string, delta: number): string {
+  const [year, m] = month.split("-").map(Number);
+  const date = new Date(Date.UTC(year ?? 1970, (m ?? 1) - 1 + delta, 1));
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+}

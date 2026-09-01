@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { TrendingUp, TrendingDown, PieChart as PieChartIcon } from "lucide-react";
+import { TrendingUp, TrendingDown, PieChart as PieChartIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import StatCard from "@/components/StatCard";
 import ProFeaturesGrid from "@/components/ProFeaturesGrid";
 import { useAuth } from "@/lib/auth-context";
 import { transactionsApi, Summary } from "@/lib/api";
-import { formatSom, currentMonth, monthLabel } from "@/lib/format";
+import { formatSom, currentMonth, monthLabel, shiftMonth } from "@/lib/format";
 
 const COLORS = ["#27824e", "#37a163", "#5bbb81", "#8ed3a8", "#bce6cc", "#0891b2", "#0ea5e9", "#94a3b8"];
 
@@ -16,10 +16,12 @@ export default function DashboardPage() {
   const { token, user } = useAuth();
   const [summary, setSummary] = useState<Summary | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const month = currentMonth();
+  const [month, setMonth] = useState(currentMonth());
+  const isCurrentMonth = month === currentMonth();
 
   useEffect(() => {
     if (!token) return;
+    setSummary(null);
     transactionsApi
       .summary(token, month)
       .then(setSummary)
@@ -30,7 +32,26 @@ export default function DashboardPage() {
     <ProtectedRoute>
       <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 sm:py-8">
         <p className="text-sm text-slate-500">Salom, {user?.fullName.split(" ")[0]} 👋</p>
-        <h1 className="text-xl font-bold text-slate-900">{monthLabel(month)}</h1>
+        <div className="mt-1 flex items-center justify-between">
+          <button
+            type="button"
+            aria-label="Oldingi oy"
+            onClick={() => setMonth((m) => shiftMonth(m, -1))}
+            className="rounded-full p-1.5 text-slate-500 hover:bg-slate-100"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <h1 className="text-xl font-bold text-slate-900">{monthLabel(month)}</h1>
+          <button
+            type="button"
+            aria-label="Keyingi oy"
+            disabled={isCurrentMonth}
+            onClick={() => setMonth((m) => shiftMonth(m, 1))}
+            className="rounded-full p-1.5 text-slate-500 hover:bg-slate-100 disabled:opacity-0"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
 
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
