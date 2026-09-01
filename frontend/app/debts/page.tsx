@@ -161,40 +161,44 @@ function DebtRow({
 }) {
   const owedToMe = debt.direction === "owed_to_me";
   return (
-    <li className="flex items-center gap-3 px-4 py-3.5">
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[14px] font-semibold text-slate-800">{debt.personName}</p>
-        <p className="text-[12px] text-slate-500">
-          {owedToMe ? "Menga qarzdor" : "Men qarzdorman"}
-          {debt.dueDate && ` · ${new Date(debt.dueDate).toLocaleDateString("uz-UZ")}`}
-        </p>
+    <li className="flex flex-col gap-2 px-4 py-3.5">
+      <div className="flex items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[14px] font-semibold text-slate-800">{debt.personName}</p>
+          <p className="truncate text-[12px] text-slate-500">
+            {owedToMe ? "Menga qarzdor" : "Men qarzdorman"}
+            {debt.dueDate && ` · ${new Date(debt.dueDate).toLocaleDateString("uz-UZ")}`}
+          </p>
+        </div>
+        <span className={`shrink-0 text-[14px] font-bold ${owedToMe ? "text-emerald-600" : "text-red-600"}`}>
+          {formatSom(debt.amount)}
+        </span>
       </div>
-      <span className={`text-[14px] font-bold ${owedToMe ? "text-emerald-600" : "text-red-600"}`}>
-        {formatSom(debt.amount)}
-      </span>
-      {debt.status === "open" && (
+      <div className="flex items-center justify-end gap-1.5">
+        {debt.status === "open" && (
+          <button
+            onClick={() => onClose(debt.id)}
+            aria-label="Yopish"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-emerald-50 hover:text-emerald-600"
+          >
+            <Check size={15} />
+          </button>
+        )}
         <button
-          onClick={() => onClose(debt.id)}
-          aria-label="Yopish"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-emerald-50 hover:text-emerald-600"
+          onClick={() => onEdit(debt)}
+          aria-label="Tahrirlash"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-brand-50 hover:text-brand-600"
         >
-          <Check size={15} />
+          <Pencil size={14} />
         </button>
-      )}
-      <button
-        onClick={() => onEdit(debt)}
-        aria-label="Tahrirlash"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-brand-50 hover:text-brand-600"
-      >
-        <Pencil size={14} />
-      </button>
-      <button
-        onClick={() => onDelete(debt.id)}
-        aria-label="O'chirish"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
-      >
-        <Trash2 size={14} />
-      </button>
+        <button
+          onClick={() => onDelete(debt.id)}
+          aria-label="O'chirish"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
+        >
+          <Trash2 size={14} />
+        </button>
+      </div>
     </li>
   );
 }

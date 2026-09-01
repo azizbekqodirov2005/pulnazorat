@@ -89,44 +89,48 @@ function RecurringContent() {
         <div className="card p-0">
           <ul className="divide-y divide-slate-100">
             {items.map((i) => (
-              <li key={i.id} className="flex items-center gap-3 px-4 py-3.5">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
-                  <BellRing size={16} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[14px] font-semibold text-slate-800">{i.title}</p>
-                  <p className="text-[12px] text-slate-500">
-                    Har oyning {i.dueDay}-kuni · {i.reminderDaysBefore} kun oldin eslatiladi
-                  </p>
-                </div>
-                {isReminderDueSoon(i) && (
-                  <span className="shrink-0 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-                    Yaqinlashmoqda
+              <li key={i.id} className="flex flex-col gap-2.5 px-4 py-3.5">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                    <BellRing size={16} />
                   </span>
-                )}
-                <span className="shrink-0 text-[14px] font-bold text-slate-800">{formatSom(i.amount)}</span>
-                <button
-                  onClick={() => toggleActive(i)}
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                    i.isActive ? "bg-brand-50 text-brand-700" : "bg-slate-100 text-slate-400"
-                  }`}
-                >
-                  {i.isActive ? "Faol" : "O'chirilgan"}
-                </button>
-                <button
-                  onClick={() => setEditingItem(i)}
-                  aria-label="Tahrirlash"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-brand-50 hover:text-brand-600"
-                >
-                  <Pencil size={14} />
-                </button>
-                <button
-                  onClick={() => handleDelete(i.id)}
-                  aria-label="O'chirish"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
-                >
-                  <Trash2 size={14} />
-                </button>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-semibold text-slate-800">{i.title}</p>
+                    <p className="truncate text-[12px] text-slate-500">
+                      Har oyning {i.dueDay}-kuni · {i.reminderDaysBefore} kun oldin eslatiladi
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-[14px] font-bold text-slate-800">{formatSom(i.amount)}</span>
+                </div>
+                <div className="flex flex-wrap items-center justify-end gap-1.5 pl-[52px]">
+                  {isReminderDueSoon(i) && (
+                    <span className="mr-auto shrink-0 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                      Yaqinlashmoqda
+                    </span>
+                  )}
+                  <button
+                    onClick={() => toggleActive(i)}
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                      i.isActive ? "bg-brand-50 text-brand-700" : "bg-slate-100 text-slate-400"
+                    }`}
+                  >
+                    {i.isActive ? "Faol" : "O'chirilgan"}
+                  </button>
+                  <button
+                    onClick={() => setEditingItem(i)}
+                    aria-label="Tahrirlash"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-brand-50 hover:text-brand-600"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(i.id)}
+                    aria-label="O'chirish"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
