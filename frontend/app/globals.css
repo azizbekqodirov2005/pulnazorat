@@ -153,3 +153,11 @@
 .dark .input::placeholder {
   color: #64758d;
 }
+
+/* Login/Register sahifasidagi qattiq yozilgan och fon — .dark body'ga
+   suyanmagani uchun alohida qayta belgilanadi, aks holda ustidagi
+   text-brand-950 kabi tungi rejim uchun ochlashtirilgan matnlar shu
+   och fonning ustida o'qib bo'lmas darajada xira ko'rinadi. */
+.dark .bg-\[\#f6faf7\] {
+  background-color: #0b1420;
+}

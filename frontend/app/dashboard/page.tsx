@@ -17,13 +17,30 @@ import { useAuth } from "@/lib/auth-context";
 import { transactionsApi, recurringApi, Summary, RecurringPayment } from "@/lib/api";
 import { formatSom, currentMonth, monthLabel, shiftMonth } from "@/lib/format";
 import { useLanguage } from "@/lib/language-context";
+import { useTheme } from "@/lib/theme-context";
 import { isReminderDueSoon, daysUntilDue } from "@/lib/reminders";
 
-const COLORS = ["#27824e", "#37a163", "#5bbb81", "#8ed3a8", "#bce6cc", "#0891b2", "#0ea5e9", "#94a3b8"];
+// Har bir rang boshqa turdagi bo'lishi kerak (bir xil rangning ochiq-tiq
+// soyalari emas), aks holda diagramma bo'laklari va pastidagi izoh matni
+// bir-biridan ajratib bo'lmaydi. Rang oq fonda ham, tungi rejim fonida ham
+// (kartaning fon rangi) o'qilishi uchun o'rtacha to'yinganlik/yorqinlikda.
+const COLORS = [
+  "#16a34a", // yashil
+  "#2563eb", // ko'k
+  "#db2777", // pushti
+  "#ea580c", // to'q sariq
+  "#7c3aed", // binafsha
+  "#0891b2", // moviy-yashil
+  "#b45309", // qahrang
+  "#dc2626", // qizil
+  "#4d7c0f", // zaytun
+  "#64748b", // kulrang
+];
 
 export default function DashboardPage() {
   const { token, user } = useAuth();
   const { t, tCategory, lang } = useLanguage();
+  const { theme } = useTheme();
   const [summary, setSummary] = useState<Summary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [month, setMonth] = useState(currentMonth());
@@ -162,7 +179,17 @@ export default function DashboardPage() {
                           <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="none" />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(v: unknown) => formatSom(Number(v ?? 0), lang)} />
+                      <Tooltip
+                        formatter={(v: unknown) => formatSom(Number(v ?? 0), lang)}
+                        contentStyle={{
+                          backgroundColor: theme === "dark" ? "#141f30" : "#ffffff",
+                          border: `1px solid ${theme === "dark" ? "#2c3c54" : "#e2e8f0"}`,
+                          borderRadius: 12,
+                          color: theme === "dark" ? "#eef2f7" : "#0f172a",
+                        }}
+                        itemStyle={{ color: theme === "dark" ? "#eef2f7" : "#0f172a" }}
+                        labelStyle={{ color: theme === "dark" ? "#eef2f7" : "#0f172a" }}
+                      />
                       <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
                     </PieChart>
                   </ResponsiveContainer>
