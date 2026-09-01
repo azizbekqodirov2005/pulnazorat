@@ -8,10 +8,12 @@ import { useAuth } from "@/lib/auth-context";
 import { categoriesApi, transactionsApi, Category, Transaction } from "@/lib/api";
 import { formatSom } from "@/lib/format";
 import { useLanguage } from "@/lib/language-context";
+import { useToast } from "@/lib/toast-context";
 
 export default function TransactionsPage() {
   const { token } = useAuth();
   const { t, tCategory, lang } = useLanguage();
+  const { showToast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -45,6 +47,7 @@ export default function TransactionsPage() {
     try {
       await transactionsApi.create(token, values);
       await load();
+      showToast(t("tx.addedToast"));
     } catch {
       setError(t("tx.createError"));
     } finally {
@@ -65,6 +68,7 @@ export default function TransactionsPage() {
       });
       await load();
       setEditingTx(null);
+      showToast(t("tx.updatedToast"));
     } catch {
       setError(t("tx.updateError"));
     } finally {
@@ -72,10 +76,33 @@ export default function TransactionsPage() {
     }
   }
 
-  async function handleDelete(id: string) {
+  function handleDelete(tx: Transaction) {
     if (!token) return;
-    await transactionsApi.remove(token, id);
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
+    const index = transactions.findIndex((item) => item.id === tx.id);
+    // Optimistik: darhol ro'yxatdan olib tashlaymiz, lekin 5 soniya ichida
+    // "Bekor qilish" bosilmasa, shundagina serverga o'chirish so'rovi ketadi.
+    setTransactions((prev) => prev.filter((item) => item.id !== tx.id));
+
+    const restore = () => {
+      setTransactions((prev) => {
+        if (prev.some((item) => item.id === tx.id)) return prev;
+        const next = [...prev];
+        next.splice(Math.min(index, next.length), 0, tx);
+        return next;
+      });
+    };
+
+    showToast(t("tx.deletedToast"), {
+      duration: 5000,
+      actionLabel: t("tx.deleteUndo"),
+      onAction: restore,
+      onExpire: () => {
+        transactionsApi.remove(token, tx.id).catch(() => {
+          restore();
+          setError(t("tx.deleteError"));
+        });
+      },
+    });
   }
 
   return (
@@ -134,7 +161,7 @@ export default function TransactionsPage() {
                           <Pencil size={14} />
                         </button>
                         <button
-                          onClick={() => handleDelete(tx.id)}
+                          onClick={() => handleDelete(tx)}
                           aria-label={t("tx.deleteAria")}
                           className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
                         >

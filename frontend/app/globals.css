@@ -29,6 +29,36 @@
   }
 }
 
+/* ---- Bildirishnoma (toast) animatsiyalari ---- */
+@keyframes toast-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.toast-pop {
+  animation: toast-pop-in 0.22s ease-out;
+}
+
+@keyframes toast-progress-shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+.toast-progress {
+  width: 100%;
+  animation-name: toast-progress-shrink;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
 /* ---- Tungi rejim ----
    Butun sayt bo'ylab bir xil Tailwind palitrasi (slate/brand/emerald/red/amber)
    ishlatilgani uchun, har sahifani alohida o'zgartirish o'rniga shu klasslarni

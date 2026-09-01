@@ -76,6 +76,11 @@ export const translations: Record<Lang, Dict> = {
     "tx.createError": "Tranzaksiyani saqlab bo'lmadi",
     "tx.updateError": "Tranzaksiyani yangilab bo'lmadi",
     "tx.loadError": "Ma'lumotlarni yuklab bo'lmadi",
+    "tx.addedToast": "Qo'shildi",
+    "tx.updatedToast": "O'zgartirildi",
+    "tx.deletedToast": "O'chirildi",
+    "tx.deleteUndo": "Bekor qilish",
+    "tx.deleteError": "O'chirib bo'lmadi",
 
     "profile.title": "Profil",
     "profile.free": "Bepul (Free)",
@@ -189,6 +194,11 @@ export const translations: Record<Lang, Dict> = {
     "tx.createError": "Не удалось сохранить транзакцию",
     "tx.updateError": "Не удалось обновить транзакцию",
     "tx.loadError": "Не удалось загрузить данные",
+    "tx.addedToast": "Добавлено",
+    "tx.updatedToast": "Изменено",
+    "tx.deletedToast": "Удалено",
+    "tx.deleteUndo": "Отменить",
+    "tx.deleteError": "Не удалось удалить",
 
     "profile.title": "Профиль",
     "profile.free": "Бесплатный (Free)",
