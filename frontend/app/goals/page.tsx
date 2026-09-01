@@ -7,7 +7,7 @@ import ProGate from "@/components/ProGate";
 import ProgressBar from "@/components/ProgressBar";
 import { useAuth } from "@/lib/auth-context";
 import { goalsApi, Goal } from "@/lib/api";
-import { formatSom } from "@/lib/format";
+import { formatSom, formatThousands } from "@/lib/format";
 import { useToast } from "@/lib/toast-context";
 
 export default function GoalsPage() {
@@ -129,12 +129,12 @@ function GoalsContent() {
                   (contributingId === g.id ? (
                     <div className="mt-3 flex gap-2">
                       <input
-                        type="number"
-                        min={1}
+                        type="text"
+                        inputMode="numeric"
                         autoFocus
                         placeholder="Summa"
-                        value={contributeValue}
-                        onChange={(e) => setContributeValue(e.target.value)}
+                        value={formatThousands(contributeValue)}
+                        onChange={(e) => setContributeValue(e.target.value.replace(/\D/g, ""))}
                         className="input"
                       />
                       <button onClick={() => handleContribute(g.id)} className="btn-primary w-auto px-4">
@@ -247,11 +247,11 @@ function GoalForm({
         className="input"
       />
       <input
-        type="number"
-        min={1}
+        type="text"
+        inputMode="numeric"
         placeholder="Maqsad summasi (so'm)"
-        value={targetAmount}
-        onChange={(e) => setTargetAmount(e.target.value)}
+        value={formatThousands(targetAmount)}
+        onChange={(e) => setTargetAmount(e.target.value.replace(/\D/g, ""))}
         className="input"
       />
       <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="input" />

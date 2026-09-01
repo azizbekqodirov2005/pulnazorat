@@ -6,7 +6,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import ProGate from "@/components/ProGate";
 import { useAuth } from "@/lib/auth-context";
 import { recurringApi, RecurringPayment } from "@/lib/api";
-import { formatSom } from "@/lib/format";
+import { formatSom, formatThousands } from "@/lib/format";
 import { isReminderDueSoon } from "@/lib/reminders";
 import { useToast } from "@/lib/toast-context";
 
@@ -240,11 +240,11 @@ function RecurringForm({
         className="input"
       />
       <input
-        type="number"
-        min={1}
+        type="text"
+        inputMode="numeric"
         placeholder="Summa (so'm)"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
+        value={formatThousands(amount)}
+        onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))}
         className="input"
       />
       <div className="grid grid-cols-2 gap-2">

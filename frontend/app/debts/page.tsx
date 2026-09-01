@@ -6,7 +6,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import ProGate from "@/components/ProGate";
 import { useAuth } from "@/lib/auth-context";
 import { debtsApi, Debt } from "@/lib/api";
-import { formatSom } from "@/lib/format";
+import { formatSom, formatThousands } from "@/lib/format";
 import { useToast } from "@/lib/toast-context";
 
 export default function DebtsPage() {
@@ -284,11 +284,11 @@ function DebtForm({
         className="input"
       />
       <input
-        type="number"
-        min={1}
+        type="text"
+        inputMode="numeric"
         placeholder="Summa (so'm)"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
+        value={formatThousands(amount)}
+        onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))}
         className="input"
       />
       <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="input" />

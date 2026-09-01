@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { Category } from "@/lib/api";
-import { todayIso, currentMonth, monthLabel } from "@/lib/format";
+import { todayIso, currentMonth, monthLabel, formatThousands } from "@/lib/format";
 import { useLanguage } from "@/lib/language-context";
 
 export interface TransactionFormValues {
@@ -124,12 +124,11 @@ export default function TransactionForm({
       <label className="flex flex-col gap-1.5">
         <span className="text-[13px] font-medium text-slate-600">{t("tx.amount")}</span>
         <input
-          type="number"
-          min={1}
-          step="0.01"
+          type="text"
+          inputMode="numeric"
           placeholder="0"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          value={formatThousands(amount)}
+          onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))}
           className="input"
         />
       </label>

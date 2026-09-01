@@ -1,3 +1,16 @@
+/** Summa kiritish maydonlari uchun: faqat raqamlarni qoldirib, minglikni bo'sh joy bilan ajratadi (masalan "50000" -> "50 000"). */
+export function formatThousands(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return "";
+  const normalized = digits.replace(/^0+(?=\d)/, "");
+  return normalized.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
+/** formatThousands bilan ko'rsatilgan qiymatdan xom raqamlarni qaytaradi. */
+export function parseThousands(formatted: string): string {
+  return formatted.replace(/\D/g, "");
+}
+
 export function formatSom(amount: number, lang: "uz" | "ru" = "uz"): string {
   const formatted = new Intl.NumberFormat("uz-UZ").format(Math.round(amount));
   return lang === "ru" ? `${formatted} сум` : `${formatted} so'm`;

@@ -7,7 +7,7 @@ import ProGate from "@/components/ProGate";
 import ProgressBar from "@/components/ProgressBar";
 import { useAuth } from "@/lib/auth-context";
 import { budgetsApi, categoriesApi, Budget, Category } from "@/lib/api";
-import { formatSom, currentMonth } from "@/lib/format";
+import { formatSom, currentMonth, formatThousands } from "@/lib/format";
 import { useToast } from "@/lib/toast-context";
 
 export default function BudgetsPage() {
@@ -114,10 +114,10 @@ function BudgetsContent() {
                         <div className="mt-1 flex items-center gap-1.5">
                           <input
                             autoFocus
-                            type="number"
-                            min={1}
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
+                            type="text"
+                            inputMode="numeric"
+                            value={formatThousands(editValue)}
+                            onChange={(e) => setEditValue(e.target.value.replace(/\D/g, ""))}
                             className="input h-8 w-28 py-1 text-[13px]"
                           />
                           <button
@@ -242,11 +242,11 @@ function BudgetForm({
         ))}
       </div>
       <input
-        type="number"
-        min={1}
+        type="text"
+        inputMode="numeric"
         placeholder="Oylik limit (so'm)"
-        value={limitAmount}
-        onChange={(e) => setLimitAmount(e.target.value)}
+        value={formatThousands(limitAmount)}
+        onChange={(e) => setLimitAmount(e.target.value.replace(/\D/g, ""))}
         className="input"
       />
       {error && <p className="text-sm text-red-600">{error}</p>}
