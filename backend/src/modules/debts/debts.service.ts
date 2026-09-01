@@ -47,6 +47,28 @@ export async function create(userId: string, input: CreateInput) {
   return toPublic(result.rows[0]);
 }
 
+export interface UpdateInput {
+  personName?: string;
+  direction?: "owed_to_me" | "i_owe";
+  amount?: number;
+  dueDate?: string;
+}
+
+export async function update(userId: string, id: string, input: UpdateInput) {
+  const result = await pool.query<DebtRow>(
+    `UPDATE debts
+     SET person_name = COALESCE($3, person_name),
+         direction = COALESCE($4, direction),
+         amount = COALESCE($5, amount),
+         due_date = COALESCE($6, due_date)
+     WHERE id = $1 AND user_id = $2
+     RETURNING *`,
+    [id, userId, input.personName ?? null, input.direction ?? null, input.amount ?? null, input.dueDate ?? null]
+  );
+  if (!result.rows[0]) throw new NotFoundError("Qarz topilmadi");
+  return toPublic(result.rows[0]);
+}
+
 export async function close(userId: string, id: string) {
   const result = await pool.query<DebtRow>(
     `UPDATE debts SET status = 'closed' WHERE id = $1 AND user_id = $2 RETURNING *`,

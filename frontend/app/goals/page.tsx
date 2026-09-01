@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Trash2, Target, Plus, PartyPopper } from "lucide-react";
+import { Trash2, Target, Plus, PartyPopper, Pencil, X } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ProGate from "@/components/ProGate";
 import ProgressBar from "@/components/ProgressBar";
 import { useAuth } from "@/lib/auth-context";
 import { goalsApi, Goal } from "@/lib/api";
 import { formatSom } from "@/lib/format";
+import { useToast } from "@/lib/toast-context";
 
 export default function GoalsPage() {
   return (
@@ -30,10 +31,12 @@ export default function GoalsPage() {
 
 function GoalsContent() {
   const { token } = useAuth();
+  const { showToast } = useToast();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [contributingId, setContributingId] = useState<string | null>(null);
   const [contributeValue, setContributeValue] = useState("");
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -62,6 +65,14 @@ function GoalsContent() {
     setGoals((prev) => prev.map((g) => (g.id === id ? updated : g)));
     setContributingId(null);
     setContributeValue("");
+  }
+
+  async function handleUpdate(input: { title: string; targetAmount: number; deadline?: string }) {
+    if (!token || !editingGoal) return;
+    const updated = await goalsApi.update(token, editingGoal.id, input);
+    setGoals((prev) => prev.map((g) => (g.id === editingGoal.id ? updated : g)));
+    setEditingGoal(null);
+    showToast("O'zgartirildi");
   }
 
   return (
@@ -93,13 +104,22 @@ function GoalsContent() {
                       {g.deadline && ` · ${new Date(g.deadline).toLocaleDateString("uz-UZ")}`}
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleDelete(g.id)}
-                    aria-label="O'chirish"
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button
+                      onClick={() => setEditingGoal(g)}
+                      aria-label="Tahrirlash"
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:bg-brand-50 hover:text-brand-600"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(g.id)}
+                      aria-label="O'chirish"
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-3">
                   <ProgressBar ratio={ratio} />
@@ -136,15 +156,56 @@ function GoalsContent() {
       )}
 
       <GoalForm onCreated={load} />
+
+      {editingGoal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+          onClick={() => setEditingGoal(null)}
+        >
+          <div className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-700">Maqsadni tahrirlash</h2>
+              <button
+                onClick={() => setEditingGoal(null)}
+                aria-label="Yopish"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <GoalForm
+              onCreated={load}
+              onUpdate={handleUpdate}
+              onCancel={() => setEditingGoal(null)}
+              initialValues={{
+                title: editingGoal.title,
+                targetAmount: editingGoal.targetAmount,
+                deadline: editingGoal.deadline ?? undefined,
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function GoalForm({ onCreated }: { onCreated: () => void }) {
+function GoalForm({
+  onCreated,
+  onUpdate,
+  onCancel,
+  initialValues,
+}: {
+  onCreated: () => void;
+  onUpdate?: (input: { title: string; targetAmount: number; deadline?: string }) => Promise<void>;
+  onCancel?: () => void;
+  initialValues?: { title: string; targetAmount: number; deadline?: string };
+}) {
   const { token } = useAuth();
-  const [title, setTitle] = useState("");
-  const [targetAmount, setTargetAmount] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const isEditing = Boolean(initialValues);
+  const [title, setTitle] = useState(initialValues?.title ?? "");
+  const [targetAmount, setTargetAmount] = useState(initialValues ? String(initialValues.targetAmount) : "");
+  const [deadline, setDeadline] = useState(initialValues?.deadline ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -159,13 +220,17 @@ function GoalForm({ onCreated }: { onCreated: () => void }) {
     setSubmitting(true);
     setError(null);
     try {
-      await goalsApi.create(token, { title, targetAmount: amount, deadline: deadline || undefined });
-      setTitle("");
-      setTargetAmount("");
-      setDeadline("");
-      onCreated();
+      if (isEditing && onUpdate) {
+        await onUpdate({ title, targetAmount: amount, deadline: deadline || undefined });
+      } else {
+        await goalsApi.create(token, { title, targetAmount: amount, deadline: deadline || undefined });
+        setTitle("");
+        setTargetAmount("");
+        setDeadline("");
+        onCreated();
+      }
     } catch {
-      setError("Maqsad qo'shib bo'lmadi");
+      setError(isEditing ? "Maqsadni yangilab bo'lmadi" : "Maqsad qo'shib bo'lmadi");
     } finally {
       setSubmitting(false);
     }
@@ -173,7 +238,7 @@ function GoalForm({ onCreated }: { onCreated: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="card flex flex-col gap-3">
-      <p className="text-[13px] font-medium text-slate-600">Yangi maqsad qo&apos;shish</p>
+      {!isEditing && <p className="text-[13px] font-medium text-slate-600">Yangi maqsad qo&apos;shish</p>}
       <input
         type="text"
         placeholder="Masalan: Mashina uchun"
@@ -191,9 +256,16 @@ function GoalForm({ onCreated }: { onCreated: () => void }) {
       />
       <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="input" />
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <button disabled={submitting} className="btn-primary">
-        {submitting ? "Saqlanmoqda..." : "Qo'shish"}
-      </button>
+      <div className="flex gap-2">
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="btn-secondary flex-1">
+            Bekor qilish
+          </button>
+        )}
+        <button disabled={submitting} className="btn-primary flex-1">
+          {submitting ? "Saqlanmoqda..." : isEditing ? "Saqlash" : "Qo'shish"}
+        </button>
+      </div>
     </form>
   );
 }

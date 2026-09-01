@@ -46,6 +46,26 @@ export async function create(userId: string, input: CreateInput) {
   return toPublic(result.rows[0]);
 }
 
+export interface UpdateInput {
+  title?: string;
+  targetAmount?: number;
+  deadline?: string;
+}
+
+export async function update(userId: string, id: string, input: UpdateInput) {
+  const result = await pool.query<GoalRow>(
+    `UPDATE goals
+     SET title = COALESCE($3, title),
+         target_amount = COALESCE($4, target_amount),
+         deadline = COALESCE($5, deadline)
+     WHERE id = $1 AND user_id = $2
+     RETURNING *`,
+    [id, userId, input.title ?? null, input.targetAmount ?? null, input.deadline ?? null]
+  );
+  if (!result.rows[0]) throw new NotFoundError("Maqsad topilmadi");
+  return toPublic(result.rows[0]);
+}
+
 export async function remove(userId: string, id: string) {
   const result = await pool.query(`DELETE FROM goals WHERE id = $1 AND user_id = $2`, [id, userId]);
   if (result.rowCount === 0) throw new NotFoundError("Maqsad topilmadi");

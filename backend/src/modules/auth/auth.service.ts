@@ -112,6 +112,15 @@ export async function getUserById(userId: string) {
   return toPublicUser(result.rows[0]);
 }
 
+export async function updateProfile(userId: string, fullName: string) {
+  const result = await pool.query<UserRow>(
+    `UPDATE users SET full_name = $2 WHERE id = $1 RETURNING *`,
+    [userId, fullName]
+  );
+  if (!result.rows[0]) throw new UnauthorizedError("Foydalanuvchi topilmadi");
+  return toPublicUser(result.rows[0]);
+}
+
 export function refreshAccessToken(refreshToken: string) {
   try {
     const payload = jwt.verify(refreshToken, env.jwtRefreshSecret) as { userId: string };

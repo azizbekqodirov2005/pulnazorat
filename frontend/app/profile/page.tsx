@@ -1,14 +1,49 @@
 "use client";
 
-import { LogOut, Mail, Globe, Gift } from "lucide-react";
+import { useState } from "react";
+import { LogOut, Mail, Globe, Gift, Pencil, Check, X } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ReferralCard from "@/components/ReferralCard";
 import { useAuth } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
+import { authApi } from "@/lib/api";
+import { useToast } from "@/lib/toast-context";
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user, token, logout, applyToken } = useAuth();
   const { t, lang } = useLanguage();
+  const { showToast } = useToast();
+  const [editingName, setEditingName] = useState(false);
+  const [nameValue, setNameValue] = useState(user?.fullName ?? "");
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [savingName, setSavingName] = useState(false);
+
+  function startEditName() {
+    setNameValue(user?.fullName ?? "");
+    setNameError(null);
+    setEditingName(true);
+  }
+
+  async function saveName() {
+    if (!token) return;
+    const trimmed = nameValue.trim();
+    if (trimmed.length < 2) {
+      setNameError(t("profile.nameRequired"));
+      return;
+    }
+    setSavingName(true);
+    setNameError(null);
+    try {
+      await authApi.updateProfile(token, trimmed);
+      await applyToken(token);
+      setEditingName(false);
+      showToast(t("profile.nameUpdatedToast"));
+    } catch {
+      setNameError(t("profile.nameUpdateError"));
+    } finally {
+      setSavingName(false);
+    }
+  }
 
   return (
     <ProtectedRoute>
@@ -24,7 +59,46 @@ export default function ProfilePage() {
               .join("")
               .toUpperCase()}
           </span>
-          <p className="mt-3 text-[16px] font-bold text-slate-900">{user?.fullName}</p>
+
+          {editingName ? (
+            <div className="mt-3 flex w-full max-w-[260px] flex-col items-stretch gap-2">
+              <input
+                autoFocus
+                type="text"
+                value={nameValue}
+                onChange={(e) => setNameValue(e.target.value)}
+                className="input text-center"
+              />
+              {nameError && <p className="text-[12px] text-red-600">{nameError}</p>}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setEditingName(false)}
+                  aria-label={t("common.cancel")}
+                  className="flex h-9 flex-1 items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200"
+                >
+                  <X size={16} />
+                </button>
+                <button
+                  onClick={saveName}
+                  disabled={savingName}
+                  aria-label={t("common.save")}
+                  className="flex h-9 flex-1 items-center justify-center rounded-lg bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-60"
+                >
+                  <Check size={16} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={startEditName}
+              aria-label={t("profile.editName")}
+              className="mt-3 flex items-center gap-1.5 text-[16px] font-bold text-slate-900"
+            >
+              {user?.fullName}
+              <Pencil size={13} className="text-slate-300" />
+            </button>
+          )}
+
           <span className="mt-1.5 rounded-full bg-brand-50 px-2.5 py-0.5 text-[11px] font-semibold text-brand-700">
             {user?.plan === "pro" ? t("profile.proActive") : t("profile.free")}
           </span>

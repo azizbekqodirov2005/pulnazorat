@@ -31,6 +31,22 @@ debtsRouter.post(
   })
 );
 
+const updateSchema = z.object({
+  personName: z.string().min(1).max(150).optional(),
+  direction: z.enum(["owed_to_me", "i_owe"]).optional(),
+  amount: z.number().positive().optional(),
+  dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+});
+
+debtsRouter.patch(
+  "/:id",
+  asyncHandler(async (req, res) => {
+    const parsed = updateSchema.safeParse(req.body);
+    if (!parsed.success) throw new ValidationError(parsed.error.issues[0]?.message ?? "Noto'g'ri ma'lumot");
+    res.json(await service.update(req.auth!.userId, req.params.id as string, parsed.data));
+  })
+);
+
 debtsRouter.patch(
   "/:id/close",
   asyncHandler(async (req, res) => {

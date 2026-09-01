@@ -64,6 +64,8 @@ export const authApi = {
   login: (input: { emailOrPhone: string; password: string }) =>
     request<AuthResponse>("/auth/login", { method: "POST", body: JSON.stringify(input) }),
   me: (token: string) => request<User>("/auth/me", { token }),
+  updateProfile: (token: string, fullName: string) =>
+    request<User>("/auth/me", { method: "PATCH", body: JSON.stringify({ fullName }), token }),
 };
 
 export interface Category {
@@ -150,6 +152,8 @@ export const budgetsApi = {
     request<Budget[]>(`/budgets${month ? `?month=${month}` : ""}`, { token }),
   create: (token: string, input: { categoryId: string; limitAmount: number; periodMonth: string }) =>
     request<Budget>("/budgets", { method: "POST", body: JSON.stringify(input), token }),
+  update: (token: string, id: string, limitAmount: number) =>
+    request<Budget>(`/budgets/${id}`, { method: "PATCH", body: JSON.stringify({ limitAmount }), token }),
   remove: (token: string, id: string) => request<void>(`/budgets/${id}`, { method: "DELETE", token }),
 };
 
@@ -168,6 +172,8 @@ export const goalsApi = {
     request<Goal>("/goals", { method: "POST", body: JSON.stringify(input), token }),
   contribute: (token: string, id: string, amount: number) =>
     request<Goal>(`/goals/${id}/contribute`, { method: "PATCH", body: JSON.stringify({ amount }), token }),
+  update: (token: string, id: string, input: { title?: string; targetAmount?: number; deadline?: string }) =>
+    request<Goal>(`/goals/${id}`, { method: "PATCH", body: JSON.stringify(input), token }),
   remove: (token: string, id: string) => request<void>(`/goals/${id}`, { method: "DELETE", token }),
 };
 
@@ -187,6 +193,11 @@ export const debtsApi = {
     input: { personName: string; direction: "owed_to_me" | "i_owe"; amount: number; dueDate?: string }
   ) => request<Debt>("/debts", { method: "POST", body: JSON.stringify(input), token }),
   close: (token: string, id: string) => request<Debt>(`/debts/${id}/close`, { method: "PATCH", token }),
+  update: (
+    token: string,
+    id: string,
+    input: { personName?: string; direction?: "owed_to_me" | "i_owe"; amount?: number; dueDate?: string }
+  ) => request<Debt>(`/debts/${id}`, { method: "PATCH", body: JSON.stringify(input), token }),
   remove: (token: string, id: string) => request<void>(`/debts/${id}`, { method: "DELETE", token }),
 };
 
@@ -203,8 +214,11 @@ export const recurringApi = {
   list: (token: string) => request<RecurringPayment[]>("/recurring-payments", { token }),
   create: (token: string, input: { title: string; amount: number; dueDay: number; reminderDaysBefore?: number }) =>
     request<RecurringPayment>("/recurring-payments", { method: "POST", body: JSON.stringify(input), token }),
-  update: (token: string, id: string, input: { isActive?: boolean }) =>
-    request<RecurringPayment>(`/recurring-payments/${id}`, { method: "PATCH", body: JSON.stringify(input), token }),
+  update: (
+    token: string,
+    id: string,
+    input: { title?: string; amount?: number; dueDay?: number; reminderDaysBefore?: number; isActive?: boolean }
+  ) => request<RecurringPayment>(`/recurring-payments/${id}`, { method: "PATCH", body: JSON.stringify(input), token }),
   remove: (token: string, id: string) => request<void>(`/recurring-payments/${id}`, { method: "DELETE", token }),
 };
 

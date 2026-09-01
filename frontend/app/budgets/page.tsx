@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Trash2, Wallet2 } from "lucide-react";
+import { Trash2, Wallet2, Pencil, Check, X } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ProGate from "@/components/ProGate";
 import ProgressBar from "@/components/ProgressBar";
 import { useAuth } from "@/lib/auth-context";
 import { budgetsApi, categoriesApi, Budget, Category } from "@/lib/api";
 import { formatSom, currentMonth } from "@/lib/format";
+import { useToast } from "@/lib/toast-context";
 
 export default function BudgetsPage() {
   return (
@@ -30,9 +31,13 @@ export default function BudgetsPage() {
 
 function BudgetsContent() {
   const { token } = useAuth();
+  const { showToast } = useToast();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
   const month = currentMonth();
 
   const load = useCallback(async () => {
@@ -59,6 +64,28 @@ function BudgetsContent() {
     setBudgets((prev) => prev.filter((b) => b.id !== id));
   }
 
+  function startEdit(b: Budget) {
+    setEditingId(b.id);
+    setEditValue(String(b.limitAmount));
+  }
+
+  async function saveEdit(id: string) {
+    if (!token) return;
+    const amount = Number(editValue);
+    if (!amount || amount <= 0) return;
+    setSavingEdit(true);
+    try {
+      const updated = await budgetsApi.update(token, id, amount);
+      setBudgets((prev) => prev.map((b) => (b.id === id ? updated : b)));
+      setEditingId(null);
+      showToast("O'zgartirildi");
+    } catch {
+      setError("Byudjetni yangilab bo'lmadi");
+    } finally {
+      setSavingEdit(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {error && <p className="text-sm text-red-600">{error}</p>}
@@ -75,6 +102,7 @@ function BudgetsContent() {
           {budgets.map((b) => {
             const category = categoryMap.get(b.categoryId);
             const ratio = b.spent / b.limitAmount;
+            const isEditing = editingId === b.id;
             return (
               <div key={b.id} className="card">
                 <div className="flex items-start justify-between gap-2">
@@ -82,18 +110,57 @@ function BudgetsContent() {
                     <span className="text-lg">{category?.icon ?? "💳"}</span>
                     <div>
                       <p className="text-[14px] font-semibold text-slate-800">{category?.name ?? "Kategoriya"}</p>
-                      <p className="text-[12px] text-slate-500">
-                        {formatSom(b.spent)} / {formatSom(b.limitAmount)}
-                      </p>
+                      {isEditing ? (
+                        <div className="mt-1 flex items-center gap-1.5">
+                          <input
+                            autoFocus
+                            type="number"
+                            min={1}
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            className="input h-8 w-28 py-1 text-[13px]"
+                          />
+                          <button
+                            onClick={() => saveEdit(b.id)}
+                            disabled={savingEdit}
+                            aria-label="Saqlash"
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-60"
+                          >
+                            <Check size={13} />
+                          </button>
+                          <button
+                            onClick={() => setEditingId(null)}
+                            aria-label="Bekor qilish"
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200"
+                          >
+                            <X size={13} />
+                          </button>
+                        </div>
+                      ) : (
+                        <p className="text-[12px] text-slate-500">
+                          {formatSom(b.spent)} / {formatSom(b.limitAmount)}
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleDelete(b.id)}
-                    aria-label="O'chirish"
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {!isEditing && (
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button
+                        onClick={() => startEdit(b)}
+                        aria-label="Tahrirlash"
+                        className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:bg-brand-50 hover:text-brand-600"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(b.id)}
+                        aria-label="O'chirish"
+                        className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-3">
                   <ProgressBar ratio={ratio} />

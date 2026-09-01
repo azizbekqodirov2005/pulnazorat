@@ -30,6 +30,21 @@ goalsRouter.post(
   })
 );
 
+const updateSchema = z.object({
+  title: z.string().min(1).max(150).optional(),
+  targetAmount: z.number().positive().optional(),
+  deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+});
+
+goalsRouter.patch(
+  "/:id",
+  asyncHandler(async (req, res) => {
+    const parsed = updateSchema.safeParse(req.body);
+    if (!parsed.success) throw new ValidationError(parsed.error.issues[0]?.message ?? "Noto'g'ri ma'lumot");
+    res.json(await service.update(req.auth!.userId, req.params.id as string, parsed.data));
+  })
+);
+
 const contributeSchema = z.object({ amount: z.number().positive() });
 
 goalsRouter.patch(

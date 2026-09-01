@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Trash2, Repeat, BellRing } from "lucide-react";
+import { Trash2, Repeat, BellRing, Pencil, X } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ProGate from "@/components/ProGate";
 import { useAuth } from "@/lib/auth-context";
 import { recurringApi, RecurringPayment } from "@/lib/api";
 import { formatSom } from "@/lib/format";
 import { isReminderDueSoon } from "@/lib/reminders";
+import { useToast } from "@/lib/toast-context";
 
 export default function RecurringPage() {
   return (
@@ -30,8 +31,10 @@ export default function RecurringPage() {
 
 function RecurringContent() {
   const { token } = useAuth();
+  const { showToast } = useToast();
   const [items, setItems] = useState<RecurringPayment[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState<RecurringPayment | null>(null);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -56,6 +59,19 @@ function RecurringContent() {
     if (!token) return;
     await recurringApi.remove(token, id);
     setItems((prev) => prev.filter((i) => i.id !== id));
+  }
+
+  async function handleUpdate(input: {
+    title: string;
+    amount: number;
+    dueDay: number;
+    reminderDaysBefore: number;
+  }) {
+    if (!token || !editingItem) return;
+    const updated = await recurringApi.update(token, editingItem.id, input);
+    setItems((prev) => prev.map((i) => (i.id === editingItem.id ? updated : i)));
+    setEditingItem(null);
+    showToast("O'zgartirildi");
   }
 
   return (
@@ -98,6 +114,13 @@ function RecurringContent() {
                   {i.isActive ? "Faol" : "O'chirilgan"}
                 </button>
                 <button
+                  onClick={() => setEditingItem(i)}
+                  aria-label="Tahrirlash"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-brand-50 hover:text-brand-600"
+                >
+                  <Pencil size={14} />
+                </button>
+                <button
                   onClick={() => handleDelete(i.id)}
                   aria-label="O'chirish"
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500"
@@ -111,16 +134,60 @@ function RecurringContent() {
       )}
 
       <RecurringForm onCreated={load} />
+
+      {editingItem && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+          onClick={() => setEditingItem(null)}
+        >
+          <div className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-700">To&apos;lovni tahrirlash</h2>
+              <button
+                onClick={() => setEditingItem(null)}
+                aria-label="Yopish"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <RecurringForm
+              onCreated={load}
+              onUpdate={handleUpdate}
+              onCancel={() => setEditingItem(null)}
+              initialValues={{
+                title: editingItem.title,
+                amount: editingItem.amount,
+                dueDay: editingItem.dueDay,
+                reminderDaysBefore: editingItem.reminderDaysBefore,
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function RecurringForm({ onCreated }: { onCreated: () => void }) {
+function RecurringForm({
+  onCreated,
+  onUpdate,
+  onCancel,
+  initialValues,
+}: {
+  onCreated: () => void;
+  onUpdate?: (input: { title: string; amount: number; dueDay: number; reminderDaysBefore: number }) => Promise<void>;
+  onCancel?: () => void;
+  initialValues?: { title: string; amount: number; dueDay: number; reminderDaysBefore: number };
+}) {
   const { token } = useAuth();
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [dueDay, setDueDay] = useState("");
-  const [reminderDaysBefore, setReminderDaysBefore] = useState("2");
+  const isEditing = Boolean(initialValues);
+  const [title, setTitle] = useState(initialValues?.title ?? "");
+  const [amount, setAmount] = useState(initialValues ? String(initialValues.amount) : "");
+  const [dueDay, setDueDay] = useState(initialValues ? String(initialValues.dueDay) : "");
+  const [reminderDaysBefore, setReminderDaysBefore] = useState(
+    initialValues ? String(initialValues.reminderDaysBefore) : "2"
+  );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -136,18 +203,27 @@ function RecurringForm({ onCreated }: { onCreated: () => void }) {
     setSubmitting(true);
     setError(null);
     try {
-      await recurringApi.create(token, {
-        title,
-        amount: numAmount,
-        dueDay: day,
-        reminderDaysBefore: Number(reminderDaysBefore) || 1,
-      });
-      setTitle("");
-      setAmount("");
-      setDueDay("");
-      onCreated();
+      if (isEditing && onUpdate) {
+        await onUpdate({
+          title,
+          amount: numAmount,
+          dueDay: day,
+          reminderDaysBefore: Number(reminderDaysBefore) || 1,
+        });
+      } else {
+        await recurringApi.create(token, {
+          title,
+          amount: numAmount,
+          dueDay: day,
+          reminderDaysBefore: Number(reminderDaysBefore) || 1,
+        });
+        setTitle("");
+        setAmount("");
+        setDueDay("");
+        onCreated();
+      }
     } catch {
-      setError("Qo'shib bo'lmadi");
+      setError(isEditing ? "Yangilab bo'lmadi" : "Qo'shib bo'lmadi");
     } finally {
       setSubmitting(false);
     }
@@ -155,7 +231,7 @@ function RecurringForm({ onCreated }: { onCreated: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="card flex flex-col gap-3">
-      <p className="text-[13px] font-medium text-slate-600">Yangi to&apos;lov qo&apos;shish</p>
+      {!isEditing && <p className="text-[13px] font-medium text-slate-600">Yangi to&apos;lov qo&apos;shish</p>}
       <input
         type="text"
         placeholder="Masalan: Ijara"
@@ -197,9 +273,16 @@ function RecurringForm({ onCreated }: { onCreated: () => void }) {
         </label>
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <button disabled={submitting} className="btn-primary">
-        {submitting ? "Saqlanmoqda..." : "Qo'shish"}
-      </button>
+      <div className="flex gap-2">
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="btn-secondary flex-1">
+            Bekor qilish
+          </button>
+        )}
+        <button disabled={submitting} className="btn-primary flex-1">
+          {submitting ? "Saqlanmoqda..." : isEditing ? "Saqlash" : "Qo'shish"}
+        </button>
+      </div>
     </form>
   );
 }

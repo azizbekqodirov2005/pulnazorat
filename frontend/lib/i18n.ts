@@ -92,6 +92,10 @@ export const translations: Record<Lang, Dict> = {
     "profile.langUz": "O'zbekcha",
     "profile.langRu": "Ruscha",
     "profile.logout": "Chiqish",
+    "profile.editName": "Ismni tahrirlash",
+    "profile.nameRequired": "Ismni kiriting",
+    "profile.nameUpdateError": "Ismni saqlab bo'lmadi",
+    "profile.nameUpdatedToast": "Ism o'zgartirildi",
 
     "referral.title": "Do'stlaringizni taklif qiling",
     "referral.feature1": "Byudjet limiti va ogohlantirish",
@@ -210,6 +214,10 @@ export const translations: Record<Lang, Dict> = {
     "profile.langUz": "Узбекский",
     "profile.langRu": "Русский",
     "profile.logout": "Выйти",
+    "profile.editName": "Изменить имя",
+    "profile.nameRequired": "Введите имя",
+    "profile.nameUpdateError": "Не удалось сохранить имя",
+    "profile.nameUpdatedToast": "Имя изменено",
 
     "referral.title": "Пригласите друзей",
     "referral.feature1": "Лимит бюджета и предупреждения",

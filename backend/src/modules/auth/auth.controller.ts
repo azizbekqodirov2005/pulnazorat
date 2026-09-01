@@ -72,3 +72,18 @@ authRouter.get(
     res.json(user);
   })
 );
+
+const updateMeSchema = z.object({
+  fullName: z.string().min(2).max(150),
+});
+
+authRouter.patch(
+  "/me",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const parsed = updateMeSchema.safeParse(req.body);
+    if (!parsed.success) throw new ValidationError(parsed.error.issues[0]?.message ?? "Noto'g'ri ma'lumot");
+    const user = await authService.updateProfile(req.auth!.userId, parsed.data.fullName);
+    res.json(user);
+  })
+);
