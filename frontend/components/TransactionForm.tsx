@@ -42,6 +42,10 @@ export default function TransactionForm({
       setError("Summani to'g'ri kiriting");
       return;
     }
+    if (occurredOn > todayIso()) {
+      setError("Kelajakdagi sana kiritib bo'lmaydi — bugungi yoki oldingi sanani tanlang");
+      return;
+    }
     await onSubmit({ type, categoryId, amount: numericAmount, note: note || undefined, occurredOn });
     setAmount("");
     setNote("");
@@ -119,6 +123,7 @@ export default function TransactionForm({
         <input
           type="date"
           value={occurredOn}
+          max={todayIso()}
           onChange={(e) => setOccurredOn(e.target.value)}
           className="input"
         />

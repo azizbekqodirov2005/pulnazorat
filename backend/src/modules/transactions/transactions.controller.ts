@@ -41,12 +41,17 @@ transactionsRouter.get(
   })
 );
 
+const notFutureDate = (val: string) => val <= new Date().toISOString().slice(0, 10);
+
 const createSchema = z.object({
   categoryId: z.string().uuid(),
   type: z.enum(["income", "expense"]),
   amount: z.number().positive(),
   note: z.string().max(500).optional(),
-  occurredOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "occurredOn format: YYYY-MM-DD"),
+  occurredOn: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "occurredOn format: YYYY-MM-DD")
+    .refine(notFutureDate, "Kelajakdagi sana kiritib bo'lmaydi"),
 });
 
 transactionsRouter.post(
@@ -71,14 +76,18 @@ const updateSchema = z.object({
   categoryId: z.string().uuid().optional(),
   amount: z.number().positive().optional(),
   note: z.string().max(500).optional(),
-  occurredOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  occurredOn: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .refine(notFutureDate, "Kelajakdagi sana kiritib bo'lmaydi")
+    .optional(),
 });
 
 transactionsRouter.patch(
   "/:id",
   asyncHandler(async (req, res) => {
     const parsed = updateSchema.safeParse(req.body);
-    if (!parsed.success) throw new ValidationError("Noto'g'ri ma'lumot");
+    if (!parsed.success) throw new ValidationError(parsed.error.issues[0]?.message ?? "Noto'g'ri ma'lumot");
     const transaction = await transactionsService.updateTransaction(req.auth!.userId, req.params.id as string, parsed.data);
     res.json(transaction);
   })
