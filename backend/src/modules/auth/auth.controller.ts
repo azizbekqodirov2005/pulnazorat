@@ -96,7 +96,6 @@ authRouter.post(
     const parsed = forgotPasswordSchema.safeParse(req.body);
     if (!parsed.success) throw new ValidationError("To'g'ri email kiriting");
     await authService.requestPasswordReset(parsed.data.email);
-    // Email topilmasa ham har doim bir xil javob — kim ro'yxatdan o'tganini bilib olishning oldini olish uchun
     res.json({ ok: true });
   })
 );

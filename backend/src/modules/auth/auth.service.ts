@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { randomInt } from "crypto";
 import { pool } from "../../config/db";
 import { env } from "../../config/env";
-import { ConflictError, UnauthorizedError } from "../../common/errors";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/errors";
 import { sendEmail } from "../../common/email";
 import * as referralsService from "../referrals/referrals.service";
 
@@ -130,9 +130,11 @@ export async function updateProfile(userId: string, fullName: string) {
 export async function requestPasswordReset(email: string): Promise<void> {
   const result = await pool.query<UserRow>(`SELECT * FROM users WHERE email = $1`, [email]);
   const user = result.rows[0];
-  // Foydalanuvchi topilmasa ham xatolik qaytarmaymiz — aks holda kim ro'yxatdan
-  // o'tgan-o'tmaganini bilib olish mumkin bo'lib qoladi (email enumeration).
-  if (!user || !user.is_active) return;
+  // Foydalanuvchi so'rovi bo'yicha: agar bu email bilan hisob mavjud bo'lmasa, aniq xabar beramiz
+  // (email enumeration xavfidan ko'ra, foydalanuvchiga aniqlik muhimroq deb belgilandi).
+  if (!user || !user.is_active) {
+    throw new NotFoundError("Bu email bilan ro'yxatdan o'tilmagan");
+  }
 
   const code = String(randomInt(100000, 1000000)); // har doim 6 xonali
   const codeHash = await bcrypt.hash(code, 10);
