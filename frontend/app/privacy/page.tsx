@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 
 export const metadata = {
-  title: "Maxfiylik siyosati — PulNazorat",
+  title: "Maxfiylik siyosati — HamyonPro",
 };
 
 export default function PrivacyPage() {
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
       <div className="card flex flex-col gap-6 text-[14px] leading-relaxed text-slate-700">
         <Section title="1. Umumiy qoidalar">
           <p>
-            Ushbu maxfiylik siyosati PulNazorat platformasi (&quot;biz&quot;, &quot;platforma&quot;) orqali
+            Ushbu maxfiylik siyosati HamyonPro platformasi (&quot;biz&quot;, &quot;platforma&quot;) orqali
             to&apos;planadigan shaxsiy va moliyaviy ma&apos;lumotlarning qanday yig&apos;ilishi, saqlanishi va
             ishlatilishini tushuntiradi. Platformadan foydalanish orqali siz ushbu siyosat shartlariga rozilik
             bildirasiz.
@@ -93,7 +93,7 @@ export default function PrivacyPage() {
         </Section>
 
         <Section title="8. Bog'lanish">
-          <p>Savol yoki so&apos;rovlaringiz bo&apos;lsa: support@pulnazorat.uz</p>
+          <p>Savol yoki so&apos;rovlaringiz bo&apos;lsa: support@hamyonpro.uz</p>
         </Section>
       </div>
 

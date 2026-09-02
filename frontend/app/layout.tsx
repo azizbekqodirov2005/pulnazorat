@@ -22,7 +22,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "PulNazorat — Shaxsiy moliya",
+  title: "HamyonPro — Shaxsiy moliya",
   description: "Kirim-chiqimingizni oson kuzating",
 };
 

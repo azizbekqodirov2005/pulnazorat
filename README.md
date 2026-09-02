@@ -1,4 +1,4 @@
-# PulNazorat — MVP + Pro modullar
+# HamyonPro — MVP + Pro modullar
 
 Shaxsiy kirim-chiqim boshqaruvi platformasi. Bepul (Free) qism: ro'yxatdan o'tish/kirish, kategoriyalar, tranzaksiyalar, dashboard (oylik xulosa + kategoriya bo'yicha diagramma). Pro qism: byudjet limiti, takrorlanuvchi to'lov eslatmalari, jamg'arma maqsadlari, qarz-nasiya kuzatuvi — pulsiz, **referal tizimi** orqali ochiladi (2 ta do'stingiz ro'yxatdan o'tsa, Pro sizga tekin ochiladi).
 

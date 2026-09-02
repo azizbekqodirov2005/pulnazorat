@@ -1,4 +1,4 @@
-# PulNazorat'ni bepul joylashtirish (Netlify + Render + Neon)
+# HamyonPro'ni bepul joylashtirish (Netlify + Render + Neon)
 
 Bu qo'llanma platformani internetga **butunlay bepul** chiqarish uchun. Uch xizmat kerak bo'ladi:
 

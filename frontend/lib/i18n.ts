@@ -113,7 +113,7 @@ export const translations: Record<Lang, Dict> = {
     "proFeatures.debts": "Qarz-nasiya",
     "proFeatures.recurring": "To'lovlar",
 
-    "landing.title": "PulNazorat",
+    "landing.title": "HamyonPro",
     "landing.subtitle": "Oylik daromadingiz qayerga ketayotganini bilib oling — kirim va chiqimingizni bir joyda, oson kuzating.",
     "landing.ctaRegister": "Bepul boshlash",
     "landing.ctaLogin": "Kirish",
@@ -235,7 +235,7 @@ export const translations: Record<Lang, Dict> = {
     "proFeatures.debts": "Долги",
     "proFeatures.recurring": "Платежи",
 
-    "landing.title": "PulNazorat",
+    "landing.title": "HamyonPro",
     "landing.subtitle": "Узнайте, куда уходит ваш ежемесячный доход — отслеживайте доходы и расходы легко, в одном месте.",
     "landing.ctaRegister": "Начать бесплатно",
     "landing.ctaLogin": "Войти",

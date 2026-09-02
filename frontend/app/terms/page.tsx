@@ -2,7 +2,7 @@ import Link from "next/link";
 import { FileText } from "lucide-react";
 
 export const metadata = {
-  title: "Foydalanish shartlari — PulNazorat",
+  title: "Foydalanish shartlari — HamyonPro",
 };
 
 export default function TermsPage() {
@@ -21,7 +21,7 @@ export default function TermsPage() {
       <div className="card flex flex-col gap-6 text-[14px] leading-relaxed text-slate-700">
         <Section title="1. Xizmat tavsifi">
           <p>
-            PulNazorat — shaxsiy kirim-chiqimni kuzatish uchun mo&apos;ljallangan veb-platforma. Bepul (Free) va Pro
+            HamyonPro — shaxsiy kirim-chiqimni kuzatish uchun mo&apos;ljallangan veb-platforma. Bepul (Free) va Pro
             darajalari mavjud; Pro imkoniyatlari (byudjet, jamg&apos;arma maqsadlari, qarz-nasiya kuzatuvi,
             takrorlanuvchi to&apos;lov eslatmalari) referal tizimi orqali, pulsiz ochiladi.
           </p>
@@ -49,7 +49,7 @@ export default function TermsPage() {
 
         <Section title="4. Javobgarlikni cheklash">
           <p>
-            PulNazorat — shaxsiy hisob-kitob yuritish vositasi, moliyaviy, soliq yoki investitsiya bo&apos;yicha
+            HamyonPro — shaxsiy hisob-kitob yuritish vositasi, moliyaviy, soliq yoki investitsiya bo&apos;yicha
             professional maslahat emas. Platformada ko&apos;rsatilgan hisob-kitoblar siz kiritgan ma&apos;lumotlarga
             asoslanadi; ularning to&apos;g&apos;riligi uchun javobgarlik foydalanuvchiga tegishli.
           </p>
@@ -67,7 +67,7 @@ export default function TermsPage() {
         </Section>
 
         <Section title="7. Bog'lanish">
-          <p>Savol yoki so&apos;rovlaringiz bo&apos;lsa: support@pulnazorat.uz</p>
+          <p>Savol yoki so&apos;rovlaringiz bo&apos;lsa: support@hamyonpro.uz</p>
         </Section>
       </div>
 

@@ -28,7 +28,7 @@ export default function Navbar() {
           <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-600 text-white">
             <Wallet size={17} strokeWidth={2.3} />
           </span>
-          <span className="text-[15px] font-bold tracking-tight text-brand-900">PulNazorat</span>
+          <span className="text-[15px] font-bold tracking-tight text-brand-900">HamyonPro</span>
         </div>
 
         <nav className="hidden items-center gap-1 sm:flex">

@@ -5,5 +5,5 @@ const app = createApp();
 
 app.listen(env.port, () => {
   // eslint-disable-next-line no-console
-  console.log(`PulNazorat API ${env.port}-portda ishga tushdi`);
+  console.log(`HamyonPro API ${env.port}-portda ishga tushdi`);
 });
