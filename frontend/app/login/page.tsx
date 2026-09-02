@@ -61,6 +61,9 @@ export default function LoginPage() {
               className="input"
             />
           </Field>
+          <Link href="/forgot-password" className="-mt-2 text-[13px] font-medium text-brand-700">
+            {t("auth.login.forgotPassword")}
+          </Link>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button disabled={submitting} className="btn-primary mt-1">
             {submitting ? t("auth.login.submitting") : t("auth.login.submit")}

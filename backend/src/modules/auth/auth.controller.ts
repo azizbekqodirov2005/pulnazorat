@@ -87,3 +87,32 @@ authRouter.patch(
     res.json(user);
   })
 );
+
+const forgotPasswordSchema = z.object({ email: z.string().email() });
+
+authRouter.post(
+  "/forgot-password",
+  asyncHandler(async (req, res) => {
+    const parsed = forgotPasswordSchema.safeParse(req.body);
+    if (!parsed.success) throw new ValidationError("To'g'ri email kiriting");
+    await authService.requestPasswordReset(parsed.data.email);
+    // Email topilmasa ham har doim bir xil javob — kim ro'yxatdan o'tganini bilib olishning oldini olish uchun
+    res.json({ ok: true });
+  })
+);
+
+const resetPasswordSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
+  newPassword: z.string().min(6).max(100),
+});
+
+authRouter.post(
+  "/reset-password",
+  asyncHandler(async (req, res) => {
+    const parsed = resetPasswordSchema.safeParse(req.body);
+    if (!parsed.success) throw new ValidationError(parsed.error.issues[0]?.message ?? "Noto'g'ri ma'lumot");
+    await authService.resetPassword(parsed.data.email, parsed.data.code, parsed.data.newPassword);
+    res.json({ ok: true });
+  })
+);

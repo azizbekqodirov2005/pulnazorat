@@ -1,9 +1,13 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { randomInt } from "crypto";
 import { pool } from "../../config/db";
 import { env } from "../../config/env";
 import { ConflictError, UnauthorizedError } from "../../common/errors";
+import { sendEmail } from "../../common/email";
 import * as referralsService from "../referrals/referrals.service";
+
+const RESET_CODE_TTL_MINUTES = 15;
 
 export interface RegisterInput {
   fullName: string;
@@ -30,6 +34,8 @@ interface UserRow {
   is_active: boolean;
   referral_code: string;
   role: "user" | "admin";
+  password_reset_code_hash: string | null;
+  password_reset_expires_at: Date | null;
 }
 
 function toPublicUser(row: UserRow) {
@@ -96,11 +102,11 @@ export async function login(input: LoginInput) {
   );
   const user = result.rows[0];
   if (!user || !user.is_active) {
-    throw new UnauthorizedError("Email/telefon yoki parol noto'g'ri");
+    throw new UnauthorizedError("Email yoki parol noto'g'ri");
   }
   const matches = await bcrypt.compare(password, user.password_hash);
   if (!matches) {
-    throw new UnauthorizedError("Email/telefon yoki parol noto'g'ri");
+    throw new UnauthorizedError("Email yoki parol noto'g'ri");
   }
   const tokens = issueTokens(user.id, user.plan);
   return { user: toPublicUser(user), ...tokens };
@@ -119,6 +125,54 @@ export async function updateProfile(userId: string, fullName: string) {
   );
   if (!result.rows[0]) throw new UnauthorizedError("Foydalanuvchi topilmadi");
   return toPublicUser(result.rows[0]);
+}
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  const result = await pool.query<UserRow>(`SELECT * FROM users WHERE email = $1`, [email]);
+  const user = result.rows[0];
+  // Foydalanuvchi topilmasa ham xatolik qaytarmaymiz — aks holda kim ro'yxatdan
+  // o'tgan-o'tmaganini bilib olish mumkin bo'lib qoladi (email enumeration).
+  if (!user || !user.is_active) return;
+
+  const code = String(randomInt(100000, 1000000)); // har doim 6 xonali
+  const codeHash = await bcrypt.hash(code, 10);
+  const expiresAt = new Date(Date.now() + RESET_CODE_TTL_MINUTES * 60 * 1000);
+
+  await pool.query(
+    `UPDATE users SET password_reset_code_hash = $2, password_reset_expires_at = $3 WHERE id = $1`,
+    [user.id, codeHash, expiresAt]
+  );
+
+  await sendEmail(
+    email,
+    "HamyonPro — parolni tiklash kodi",
+    `<div style="font-family:sans-serif;font-size:15px;color:#0f172a">
+       <p>Parolni tiklash uchun tasdiqlash kodi:</p>
+       <p style="font-size:28px;font-weight:700;letter-spacing:4px">${code}</p>
+       <p style="color:#64748b">Kod ${RESET_CODE_TTL_MINUTES} daqiqa amal qiladi. Agar bu so'rovni siz yubormagan bo'lsangiz, shunchaki e'tibor bermang — hisobingiz xavfsiz.</p>
+     </div>`
+  );
+}
+
+export async function resetPassword(email: string, code: string, newPassword: string): Promise<void> {
+  const result = await pool.query<UserRow>(`SELECT * FROM users WHERE email = $1`, [email]);
+  const user = result.rows[0];
+  if (!user || !user.password_reset_code_hash || !user.password_reset_expires_at) {
+    throw new UnauthorizedError("Kod noto'g'ri yoki muddati o'tgan");
+  }
+  if (new Date(user.password_reset_expires_at).getTime() < Date.now()) {
+    throw new UnauthorizedError("Kod muddati o'tgan — qaytadan so'rang");
+  }
+  const matches = await bcrypt.compare(code, user.password_reset_code_hash);
+  if (!matches) {
+    throw new UnauthorizedError("Kod noto'g'ri");
+  }
+
+  const newHash = await bcrypt.hash(newPassword, 10);
+  await pool.query(
+    `UPDATE users SET password_hash = $2, password_reset_code_hash = NULL, password_reset_expires_at = NULL WHERE id = $1`,
+    [user.id, newHash]
+  );
 }
 
 export function refreshAccessToken(refreshToken: string) {

@@ -20,3 +20,9 @@ services:
         value: 15m
       - key: JWT_REFRESH_EXPIRES
         value: 30d
+      # Parolni tiklash kodini emailga yuborish uchun (ixtiyoriy — resend.com'dan olinadi).
+      # Sozlanmasa, "parolni unutdim" funksiyasi xato qaytaradi, lekin qolgan hamma narsa ishlayveradi.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
