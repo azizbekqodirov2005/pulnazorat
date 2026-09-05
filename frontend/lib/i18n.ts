@@ -7,7 +7,6 @@ export const translations: Record<Lang, Dict> = {
     "nav.dashboard": "Bosh sahifa",
     "nav.transactions": "Tranzaksiyalar",
     "nav.profile": "Profil",
-    "nav.developer": "Dasturchi",
 
     "common.save": "Saqlash",
     "common.saving": "Saqlanmoqda...",
@@ -109,6 +108,7 @@ export const translations: Record<Lang, Dict> = {
     "profile.langUz": "O'zbekcha",
     "profile.langRu": "Ruscha",
     "profile.logout": "Chiqish",
+    "profile.developer": "Dasturchi",
     "profile.editName": "Ismni tahrirlash",
     "profile.nameRequired": "Ismni kiriting",
     "profile.nameUpdateError": "Ismni saqlab bo'lmadi",
@@ -146,7 +146,6 @@ export const translations: Record<Lang, Dict> = {
     "nav.dashboard": "Главная",
     "nav.transactions": "Транзакции",
     "nav.profile": "Профиль",
-    "nav.developer": "Разработчик",
 
     "common.save": "Сохранить",
     "common.saving": "Сохранение...",
@@ -248,6 +247,7 @@ export const translations: Record<Lang, Dict> = {
     "profile.langUz": "Узбекский",
     "profile.langRu": "Русский",
     "profile.logout": "Выйти",
+    "profile.developer": "Разработчик",
     "profile.editName": "Изменить имя",
     "profile.nameRequired": "Введите имя",
     "profile.nameUpdateError": "Не удалось сохранить имя",

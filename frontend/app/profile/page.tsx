@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Mail, Globe, Gift, Pencil, Check, X } from "lucide-react";
+import { LogOut, Mail, Globe, Gift, Pencil, Check, X, Code2 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ReferralCard from "@/components/ReferralCard";
 import { useAuth } from "@/lib/auth-context";
@@ -138,6 +138,16 @@ export default function ProfilePage() {
           <LogOut size={16} />
           {t("profile.logout")}
         </button>
+
+        <a
+          href="https://t.me/azbekdev"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-100 bg-white px-4 py-2.5 text-[13px] font-medium text-slate-400 shadow-card transition-colors hover:text-slate-600"
+        >
+          <Code2 size={14} />
+          {t("profile.developer")}
+        </a>
       </main>
     </ProtectedRoute>
   );

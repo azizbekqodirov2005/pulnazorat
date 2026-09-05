@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, ArrowLeftRight, UserRound, Code2 } from "lucide-react";
+import { LayoutGrid, ArrowLeftRight, UserRound } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
-
-export const TELEGRAM_GROUP_URL = "https://t.me/azbekdev";
 
 export default function BottomNav() {
   const { user } = useAuth();
@@ -44,17 +42,6 @@ export default function BottomNav() {
             </Link>
           );
         })}
-        <a
-          href={TELEGRAM_GROUP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex flex-1 flex-col items-center gap-0.5 py-2.5"
-        >
-          <Code2 size={21} strokeWidth={2} className="text-slate-400" />
-          <span className="text-[11px] font-medium text-slate-400">
-            {t("nav.developer")}
-          </span>
-        </a>
       </div>
     </nav>
   );
