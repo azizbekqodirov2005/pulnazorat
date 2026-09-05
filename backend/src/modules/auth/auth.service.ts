@@ -36,6 +36,7 @@ interface UserRow {
   role: "user" | "admin";
   password_reset_code_hash: string | null;
   password_reset_expires_at: Date | null;
+  pro_unlocked_via: string | null;
 }
 
 function toPublicUser(row: UserRow) {
@@ -49,6 +50,7 @@ function toPublicUser(row: UserRow) {
     plan: row.plan,
     referralCode: row.referral_code,
     role: row.role,
+    proUnlockedVia: row.pro_unlocked_via,
   };
 }
 

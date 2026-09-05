@@ -45,6 +45,7 @@ export interface User {
   plan: "free" | "pro";
   referralCode: string;
   role: "user" | "admin";
+  proUnlockedVia: string | null;
 }
 
 export interface AuthResponse {

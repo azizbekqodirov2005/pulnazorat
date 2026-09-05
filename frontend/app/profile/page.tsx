@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Mail, Globe, Gift, Pencil, Check, X, Code2 } from "lucide-react";
+import { LogOut, Mail, Globe, Gift, Pencil, Check, X, Code2, ChevronRight } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ReferralCard from "@/components/ReferralCard";
 import { useAuth } from "@/lib/auth-context";
@@ -112,7 +112,11 @@ export default function ProfilePage() {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-[14px] font-semibold text-slate-800">{t("profile.proActiveTitle")}</p>
-                <p className="text-[12px] text-slate-500">{t("profile.proActiveDesc")}</p>
+                <p className="text-[12px] text-slate-500">
+                  {user?.proUnlockedVia === "admin_grant"
+                    ? t("profile.proActiveDescAdmin")
+                    : t("profile.proActiveDescReferral")}
+                </p>
               </div>
             </div>
           </div>
@@ -129,6 +133,20 @@ export default function ProfilePage() {
             label={t("profile.language")}
             value={lang === "uz" ? t("profile.langUz") : t("profile.langRu")}
           />
+          <a
+            href="https://t.me/azbekdev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-4 py-3.5 first:pt-4 last:pb-4"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500">
+              <Code2 size={16} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[14px] font-medium text-slate-800">{t("profile.developer")}</p>
+            </div>
+            <ChevronRight size={16} className="shrink-0 text-slate-300" />
+          </a>
         </div>
 
         <button
@@ -138,16 +156,6 @@ export default function ProfilePage() {
           <LogOut size={16} />
           {t("profile.logout")}
         </button>
-
-        <a
-          href="https://t.me/azbekdev"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-100 bg-white px-4 py-2.5 text-[13px] font-medium text-slate-400 shadow-card transition-colors hover:text-slate-600"
-        >
-          <Code2 size={14} />
-          {t("profile.developer")}
-        </a>
       </main>
     </ProtectedRoute>
   );
