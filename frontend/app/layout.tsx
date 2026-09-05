@@ -22,8 +22,32 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://hamyonpro.uz"),
   title: "HamyonPro — Shaxsiy moliya",
-  description: "Kirim-chiqimingizni oson kuzating",
+  description:
+    "HamyonPro — kirim va chiqimlaringizni oson kuzatish, byudjet, maqsad va qarzlarni boshqarish uchun shaxsiy moliya platformasi.",
+  keywords: [
+    "HamyonPro",
+    "hamyonpro",
+    "hamyonpro.uz",
+    "hamyon pro",
+    "shaxsiy moliya",
+    "kirim chiqim",
+    "byudjet",
+    "moliyaviy kuzatuv",
+    "pul nazorati",
+  ],
+  openGraph: {
+    title: "HamyonPro — Shaxsiy moliya",
+    description: "Kirim-chiqimingizni oson kuzating",
+    url: "https://hamyonpro.uz",
+    siteName: "HamyonPro",
+    locale: "uz_UZ",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://hamyonpro.uz",
+  },
 };
 
 export default function RootLayout({
