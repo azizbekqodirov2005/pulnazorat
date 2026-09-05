@@ -7,7 +7,7 @@ export const translations: Record<Lang, Dict> = {
     "nav.dashboard": "Bosh sahifa",
     "nav.transactions": "Tranzaksiyalar",
     "nav.profile": "Profil",
-    "nav.telegram": "Guruh",
+    "nav.developer": "Dasturchi",
 
     "common.save": "Saqlash",
     "common.saving": "Saqlanmoqda...",
@@ -146,7 +146,7 @@ export const translations: Record<Lang, Dict> = {
     "nav.dashboard": "Главная",
     "nav.transactions": "Транзакции",
     "nav.profile": "Профиль",
-    "nav.telegram": "Группа",
+    "nav.developer": "Разработчик",
 
     "common.save": "Сохранить",
     "common.saving": "Сохранение...",

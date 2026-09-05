@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Wallet, LogOut, Sun, Moon } from "lucide-react";
+import { Wallet, LogOut, Sun, Moon, Code2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import { useLanguage } from "@/lib/language-context";
+import { TELEGRAM_GROUP_URL } from "@/components/BottomNav";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -46,6 +47,15 @@ export default function Navbar() {
               </Link>
             );
           })}
+          <a
+            href={TELEGRAM_GROUP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+          >
+            <Code2 size={15} strokeWidth={2.2} />
+            {t("nav.developer")}
+          </a>
         </nav>
 
         <div className="flex items-center gap-1.5">
