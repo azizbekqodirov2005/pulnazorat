@@ -42,10 +42,14 @@ function BudgetsContent() {
 
   const load = useCallback(async () => {
     if (!token) return;
+    // Kategoriyalarni avval keshdan darhol ko'rsatamiz, fonda yangilanadi.
+    const cachedCategories = categoriesApi.listCached(token, (fresh) =>
+      setCategories(fresh.filter((cat) => cat.type === "expense"))
+    );
+    if (cachedCategories) setCategories(cachedCategories.filter((cat) => cat.type === "expense"));
     try {
-      const [b, c] = await Promise.all([budgetsApi.list(token, month), categoriesApi.list(token)]);
+      const b = await budgetsApi.list(token, month);
       setBudgets(b);
-      setCategories(c.filter((cat) => cat.type === "expense"));
     } catch {
       setError("Ma'lumotlarni yuklab bo'lmadi");
     }

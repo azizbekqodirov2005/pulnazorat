@@ -24,12 +24,12 @@ export default function TransactionsPage() {
 
   const load = useCallback(async () => {
     if (!token) return;
+    // Kategoriyalarni avval keshdan darhol ko'rsatamiz, fonda yangilanadi — backend
+    // sekin ishga tushayotgan (uxlab qolgan) paytda ham ikonkalar darhol chiqadi.
+    const cachedCategories = categoriesApi.listCached(token, setCategories);
+    if (cachedCategories) setCategories(cachedCategories);
     try {
-      const [cats, txs] = await Promise.all([
-        categoriesApi.list(token),
-        transactionsApi.list(token, { page: 1, pageSize: 50 }),
-      ]);
-      setCategories(cats);
+      const txs = await transactionsApi.list(token, { page: 1, pageSize: 50 });
       setTransactions(txs.items);
     } catch {
       setError(t("tx.loadError"));

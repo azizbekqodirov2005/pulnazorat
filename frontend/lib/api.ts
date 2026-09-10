@@ -84,8 +84,40 @@ export interface Category {
   isSystem: boolean;
 }
 
+const CATEGORIES_CACHE_KEY = "hamyonpro_categories_cache_v1";
+
 export const categoriesApi = {
   list: (token: string) => request<Category[]>("/categories", { token }),
+  /**
+   * Kategoriyalarni avval qurilmadagi keshdan darhol qaytaradi (agar bo'lsa),
+   * shu bilan birga fonda serverdan yangisini so'rab, `onFresh` orqali xabar beradi.
+   * Bu — backend "uxlab qolgan" (Render bepul tarifida) paytda ham kategoriya
+   * ikonkalari darhol ko'rinishi uchun kerak; kategoriyalar kamdan-kam o'zgaradi,
+   * shuning uchun eskirgan keshni ko'rsatib turish xavfsiz.
+   */
+  listCached: (token: string, onFresh?: (cats: Category[]) => void): Category[] | null => {
+    let cached: Category[] | null = null;
+    try {
+      const raw = localStorage.getItem(CATEGORIES_CACHE_KEY);
+      if (raw) cached = JSON.parse(raw);
+    } catch {
+      cached = null;
+    }
+    categoriesApi
+      .list(token)
+      .then((fresh) => {
+        try {
+          localStorage.setItem(CATEGORIES_CACHE_KEY, JSON.stringify(fresh));
+        } catch {
+          // localStorage mavjud bo'lmasa ham (masalan xususiy oyna) — jim o'tkazib yuboramiz
+        }
+        onFresh?.(fresh);
+      })
+      .catch(() => {
+        // Fon jarayonidagi xato jim o'tkaziladi — keshdagi eski ma'lumot baribir ko'rsatilgan
+      });
+    return cached;
+  },
 };
 
 export interface Transaction {

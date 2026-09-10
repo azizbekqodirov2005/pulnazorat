@@ -8,13 +8,13 @@ export default function LandingPage() {
   const { t } = useLanguage();
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-brand-50 via-[#f6faf7] to-[#f6faf7]">
+    <main className="min-h-screen bg-[#f6faf7]">
       <div className="app-container flex flex-col items-center pb-16 pt-14 text-center sm:pt-20">
         <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-brand-600 text-white shadow-card">
           <Wallet size={30} strokeWidth={2.2} />
         </span>
 
-        <h1 className="mt-5 text-[28px] font-extrabold leading-tight tracking-tight text-brand-950 sm:text-3xl">
+        <h1 className="mt-5 text-[28px] font-extrabold leading-tight tracking-tight text-brand-600 sm:text-3xl">
           {t("landing.title")}
         </h1>
         <p className="mt-2.5 text-[15px] leading-relaxed text-slate-500">{t("landing.subtitle")}</p>
