@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Wallet, LogOut, Sun, Moon } from "lucide-react";
+import { Wallet, LogOut, Sun, Moon, Code2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import { useLanguage } from "@/lib/language-context";
@@ -53,6 +53,15 @@ export default function Navbar() {
             {user.plan === "pro" ? "PRO" : "FREE"}
           </span>
           <span className="hidden text-sm font-medium text-slate-600 sm:inline">{user.fullName.split(" ")[0]}</span>
+          <a
+            href="https://t.me/azbekdev"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Dasturchi"
+            className="hidden h-8 w-8 items-center justify-center rounded-full text-slate-900 hover:bg-slate-100 sm:flex"
+          >
+            <Code2 size={16} />
+          </a>
           <button
             onClick={() => setLang(lang === "uz" ? "ru" : "uz")}
             aria-label="Tilni almashtirish"
