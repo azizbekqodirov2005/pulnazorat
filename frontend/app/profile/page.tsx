@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Mail, Globe, Gift, Pencil, Check, X, ChevronRight } from "lucide-react";
+import { LogOut, Mail, Globe, Gift, Pencil, Check, X } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ReferralCard from "@/components/ReferralCard";
 import { useAuth } from "@/lib/auth-context";
@@ -133,22 +133,17 @@ export default function ProfilePage() {
             label={t("profile.language")}
             value={lang === "uz" ? t("profile.langUz") : t("profile.langRu")}
           />
-          <a
-            href="https://t.me/azbekdev"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-4 py-3.5 first:pt-4 last:pb-4"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-50">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/dev-logo.jpg" alt="AzbekDev" className="h-full w-full object-cover" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-[14px] font-medium text-slate-800">{t("profile.developer")}</p>
-            </div>
-            <ChevronRight size={16} className="shrink-0 text-slate-300" />
-          </a>
         </div>
+
+        <a
+          href="https://t.me/azbekdev"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 flex items-center justify-center rounded-2xl border border-slate-100 bg-white p-4 shadow-card"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/dev-logo.png" alt="AzbekDev Software Solutions" className="h-auto w-full max-w-[280px]" />
+        </a>
 
         <button
           onClick={logout}
