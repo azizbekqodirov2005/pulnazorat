@@ -142,7 +142,17 @@ export default function ProfilePage() {
           className="mt-4 flex items-center justify-center rounded-2xl border border-slate-100 bg-white p-4 shadow-card"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/dev-logo.png" alt="AzbekDev Software Solutions" className="h-auto w-full max-w-[280px]" />
+          <img
+            src="/dev-logo.png"
+            alt="AzbekDev Software Solutions"
+            className="block h-auto w-full max-w-[280px] dark:hidden"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/dev-logo-dark.png"
+            alt="AzbekDev Software Solutions"
+            className="hidden h-auto w-full max-w-[280px] dark:block"
+          />
         </a>
 
         <button
