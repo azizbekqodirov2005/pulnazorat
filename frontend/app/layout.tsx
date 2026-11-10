@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/lib/language-context";
 import { ToastProvider } from "@/lib/toast-context";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 const themeInitScript = `(function(){try{var t=localStorage.getItem('pulnazorat-theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark');}}catch(e){}})();`;
 
@@ -48,6 +49,22 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://hamyonpro.uz",
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "HamyonPro",
+  },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#27824e",
 };
 
 export default function RootLayout({
@@ -63,6 +80,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#f6faf7] font-sans text-slate-900 antialiased`}
       >
+        <ServiceWorkerRegister />
         <ThemeProvider>
           <LanguageProvider>
             <AuthProvider>

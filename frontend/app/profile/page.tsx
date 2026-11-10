@@ -1,18 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Mail, Globe, Gift, Pencil, Check, X } from "lucide-react";
+import { LogOut, Mail, Globe, Gift, Pencil, Check, X, Download } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ReferralCard from "@/components/ReferralCard";
 import { useAuth } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
 import { authApi } from "@/lib/api";
 import { useToast } from "@/lib/toast-context";
+import { usePwaInstall } from "@/lib/use-pwa-install";
 
 export default function ProfilePage() {
   const { user, token, logout, applyToken } = useAuth();
   const { t, lang } = useLanguage();
   const { showToast } = useToast();
+  const { canInstall, promptInstall } = usePwaInstall();
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(user?.fullName ?? "");
   const [nameError, setNameError] = useState<string | null>(null);
@@ -134,6 +136,23 @@ export default function ProfilePage() {
             value={lang === "uz" ? t("profile.langUz") : t("profile.langRu")}
           />
         </div>
+
+        {canInstall && (
+          <button
+            onClick={promptInstall}
+            className="mt-4 flex w-full items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 text-left shadow-card"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+              <Download size={18} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[14px] font-semibold text-slate-800">Ilovani o&apos;rnatish</p>
+              <p className="text-[12px] text-slate-500">
+                Tezroq kirish uchun HamyonPro&apos;ni qurilmangizga o&apos;rnating
+              </p>
+            </div>
+          </button>
+        )}
 
         <a
           href="https://t.me/azbekdev"

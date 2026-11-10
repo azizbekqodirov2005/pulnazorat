@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Wallet, LogOut, Sun, Moon, Code2 } from "lucide-react";
+import { Wallet, LogOut, Sun, Moon, Code2, Download } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import { useLanguage } from "@/lib/language-context";
+import { usePwaInstall } from "@/lib/use-pwa-install";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { lang, setLang, t } = useLanguage();
+  const { canInstall, promptInstall } = usePwaInstall();
   const pathname = usePathname();
 
   const links = [
@@ -67,6 +69,15 @@ export default function Navbar() {
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
+          {canInstall && (
+            <button
+              onClick={promptInstall}
+              aria-label="Ilovani o'rnatish"
+              className="hidden h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-900 sm:flex"
+            >
+              <Download size={16} />
+            </button>
+          )}
           <a
             href="https://t.me/azbekdev"
             target="_blank"
